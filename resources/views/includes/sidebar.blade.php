@@ -11,17 +11,14 @@
 			<div class="menu-profile">
 				<a href="javascript:;" class="menu-profile-link" data-toggle="app-sidebar-profile" data-target="#appSidebarProfileMenu">
 					<div class="menu-profile-cover with-shadow"></div>
-					<div class="menu-profile-image">
-						<img src="/assets/img/user/user-13.jpg" alt="" />
-					</div>
 					<div class="menu-profile-info">
 						<div class="d-flex align-items-center">
 							<div class="flex-grow-1">
-								Sean Ngu
+								Fire Command
 							</div>
 							<div class="menu-caret ms-auto"></div>
 						</div>
-						<small>Front end developer</small>
+						<small>Logged in as Commander</small>
 					</div>
 				</a>
 			</div>

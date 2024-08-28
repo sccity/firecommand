@@ -6,6 +6,9 @@ class MainController extends Controller {
     public function dashboardV1() {
         return view('pages/dashboard-v1');
     }
+    public function activeCalls() {
+        return view('pages/activecalls');
+    }
     public function dashboardV2() {
         return view('pages/dashboard-v2');
     }

@@ -12,12 +12,12 @@
 */
 
 Route::get('/', function () {
-	return redirect('/dashboard/v2');
+	return redirect('/activecalls');
 });
 Route::get('/dashboard/v1', 'MainController@dashboardV1')->name('dashboard-v1');
 Route::get('/dashboard/v2', 'MainController@dashboardV2')->name('dashboard-v2');
 Route::get('/dashboard/v3', 'MainController@dashboardV3')->name('dashboard-v3');
-
+Route::get('/activecalls', 'MainController@activeCalls')->name('activecalls');
 Route::get('/email/inbox', 'MainController@emailInbox')->name('email-inbox');
 Route::get('/email/compose', 'MainController@emailCompose')->name('email-compose');
 Route::get('/email/detail', 'MainController@emailDetail')->name('email-detail');

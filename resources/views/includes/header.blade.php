@@ -16,7 +16,7 @@
 			<span class="icon-bar"></span>
 		</button>
 		@endif
-		<a href="/" class="navbar-brand"><span class="navbar-logo"></span> <b>Color</b> Admin</a>
+		<a href="/" class="navbar-brand"><span class="navbar-logo"></span> <b>Fire</b> Command</a>
 		@if ($appHeaderMegaMenu && !$appSidebarTwo)
 		<button type="button" class="navbar-mobile-toggler" data-bs-toggle="collapse" data-bs-target="#top-navbar">
 			<span class="fa-stack fa-lg">
@@ -66,7 +66,7 @@
 				<i class="fa fa-bell"></i>
 				<span class="badge">5</span>
 			</a>
-			@include('includes.component.header-dropdown-notification')
+			<!-- @include('includes.component.header-dropdown-notification') -->
 		</div>
 		
 		@isset($appHeaderLanguageBar)
@@ -75,9 +75,8 @@
 		
 		<div class="navbar-item navbar-user dropdown">
 			<a href="#" class="navbar-link dropdown-toggle d-flex align-items-center" data-bs-toggle="dropdown">
-				<img src="/assets/img/user/user-13.jpg" alt="" /> 
 				<span>
-					<span class="d-none d-md-inline">Adam Schwartz</span>
+					<span class="d-none d-md-inline">Commander</span>
 					<b class="caret"></b>
 				</span>
 			</a>
