@@ -26,6 +26,8 @@
 	$appContentClass = (!empty($appContentClass)) ? $appContentClass : '';
 @endphp
 <body class="{{ $bodyClass }}">
+	<div class="app-cover"></div>
+
 	@include('includes.component.page-loader')
 	
 	<div id="app" class="app app-sidebar-fixed {{ $appClass }}">

@@ -5,11 +5,49 @@
 @push('css')
 	<link href="/assets/plugins/jvectormap-next/jquery-jvectormap.css" rel="stylesheet" />
 	<link href="/assets/plugins/bootstrap-datepicker/dist/css/bootstrap-datepicker.css" rel="stylesheet" />
-	<link href="/assets/plugins/gritter/css/jquery.gritter.css" rel="stylesheet" />
+	<link href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css" rel="stylesheet" />
+    <style>
+        /* Overall theme adjustments */
+        #activeCallsTable {
+            background-color: #2c3e50 !important; /* Table background */
+            color: #ecf0f1 !important; /* Table text color */
+        }
+
+        /* Ensure the header row background and text color */
+        #activeCallsTable thead {
+            background-color: #2e363d !important; /* Darker header background */
+            color: #ffffff !important; /* Light text color for header */
+        }
+
+        /* Target the rows specifically */
+        #activeCallsTable tbody tr {
+            background-color: #161a1d !important; /* Dark background for rows */
+            color: #ecf0f1 !important; /* Light text color for rows */
+        }
+
+        /* Directly target the Agency column */
+        #activeCallsTable tbody tr td:nth-child(1) {
+            background-color: #2c3e50 !important; /* Match the row background color */
+            color: #ecf0f1 !important; /* Ensure text color is applied */
+        }
+
+        /* Hover effect for rows including the Agency column */
+        #activeCallsTable tbody tr:hover,
+        #activeCallsTable tbody tr:hover td:nth-child(1) {
+            background-color: #34495e !important; /* Slightly lighter background on hover */
+            color: #ffffff !important; /* Ensure text stays readable on hover */
+        }
+
+        /* Make rows larger */
+        #activeCallsTable tbody tr,
+        #activeCallsTable tbody td {
+            font-size: 16px !important;
+            padding: 15px 8px !important;
+        }
+    </style>
 @endpush
 
 @push('scripts')
-	<script src="/assets/plugins/gritter/js/jquery.gritter.js"></script>
 	<script src="/assets/plugins/flot/source/jquery.canvaswrapper.js"></script>
 	<script src="/assets/plugins/flot/source/jquery.colorhelpers.js"></script>
 	<script src="/assets/plugins/flot/source/jquery.flot.js"></script>
@@ -35,6 +73,16 @@
 	<script src="/assets/plugins/bootstrap-datepicker/dist/js/bootstrap-datepicker.js"></script>
 	<script src="/assets/js/demo/dashboard.js"></script>
 	<script src="/assets/js/clock.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#activeCallsTable').DataTable({
+                paging: true,     // Disable pagination
+                info: false,       // Disable table information
+                searching: false,  // Disable search box
+            });
+        });
+    </script>
 @endpush
 
 @section('content')
@@ -44,23 +92,41 @@
 	</ol>
 	<!-- end breadcrumb -->
 	<!-- begin page-header -->
-	<h1 class="page-header">Active Calls:<small></small></h1>
+	<h1 class="page-header"><small></small></h1>
 	<!-- end page-header -->
-
-	<!-- begin panel -->
-	<div class="panel panel-inverse">
-		<div class="panel-heading">
-			<h4 class="panel-title">Panel Title here</h4>
-			<div class="panel-heading-btn">
-				<a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-default" data-click="panel-expand"><i class="fa fa-expand"></i></a>
-				<a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-success" data-click="panel-reload"><i class="fa fa-redo"></i></a>
-				<a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-warning" data-click="panel-collapse"><i class="fa fa-minus"></i></a>
-				<a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-danger" data-click="panel-remove"><i class="fa fa-times"></i></a>
-			</div>
-		</div>
-		<div class="panel-body">
-			Panel Content Here
-		</div>
-	</div>
-	<!-- end panel -->
+         <!-- begin panel -->
+    <div class="panel panel-inverse">
+        <div class="panel-heading">
+            <h4 class="panel-title">Active Calls</h4>
+        </div>
+        <div class="panel-body">
+            @if(!empty($activeCalls))
+    <table id="activeCallsTable" class="display" style="width:100%">
+        <thead>
+            <tr>
+                <th>Agency</th>
+                <th>Nature</th>
+                <th>Status</th>
+                <th>Address</th>
+                <th>Dispatched</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach ($activeCalls as $call)
+                <tr>
+                    <td>{{ $call['agency'] }}</td>
+                    <td>{{ $call['nature'] }}</td>
+                    <td>{{ $call['status'] }}</td>
+                    <td>{{ $call['address'] }}</td>
+                    <td>{{ \Carbon\Carbon::parse($call['date'])->format('Y-m-d H:i:s') }}</td>
+                </tr>
+            @endforeach
+        </tbody>
+    </table>
+@else
+    <p>There are currently no active calls.</p>
+@endif
+        </div>
+    </div>
+    <!-- end panel -->
 @endsection

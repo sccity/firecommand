@@ -265,7 +265,7 @@
   --bs-emphasis-color-rgb: 255, 255, 255;
   --bs-secondary-color: rgba(222, 226, 230, 0.75);
   --bs-secondary-color-rgb: 222, 226, 230;
-  --bs-secondary-bg: #2d353c;
+  --bs-secondary-bg: #2e363d
   --bs-secondary-bg-rgb: 45, 53, 60;
   --bs-tertiary-color: rgba(222, 226, 230, 0.5);
   --bs-tertiary-color-rgb: 222, 226, 230;
@@ -2221,7 +2221,7 @@ progress {
 
 .table-primary {
   --bs-table-color: #000000;
-  --bs-table-bg: #d6e9f9;
+  --bs-table-bg: #265982;
   --bs-table-border-color: #c1d2e0;
   --bs-table-striped-bg: black;
   --bs-table-striped-color: #FFFFFF;
@@ -2263,7 +2263,7 @@ progress {
 
 .table-info {
   --bs-table-color: #000000;
-  --bs-table-bg: #dbf0f7;
+  --bs-table-bg: #207c9a;
   --bs-table-border-color: #c5d8de;
   --bs-table-striped-bg: black;
   --bs-table-striped-color: #FFFFFF;
@@ -36310,4 +36310,13 @@ a.editable-click:hover {
 /* Helper Display */
 .hide {
   display: none !important;
+}
+/* Add this to your main stylesheet */
+.menu-item.menu-open > .menu-submenu {
+  display: block; /* Ensure submenu is visible */
+}
+
+.menu-item.menu-open > a.menu-link {
+  background-color: #007bff; /* Adjust to fit your theme */
+  color: #fff; /* Adjust text color */
 }

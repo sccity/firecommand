@@ -34,5 +34,9 @@ return [
         'key' => env('STRIPE_KEY'),
         'secret' => env('STRIPE_SECRET'),
     ],
+    'api' => [
+        'url' => env('API_URL'),
+        'token' => env('API_TOKEN'),
+    ]
 
 ];
