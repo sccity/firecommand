@@ -59,8 +59,9 @@
                 searching: false,
                 ordering: false,
             });
-
-            $('#activeCallsTable tbody tr').on('click', function() {
+    
+            // Delegate the click event to the tbody, so it works with dynamically added rows
+            $('#activeCallsTable tbody').on('click', 'tr', function() {
                 var callId = $(this).data('call-id');
                 window.location.href = '/ic/' + callId;
             });
@@ -80,7 +81,7 @@
                     }
                 });
             }
-
+    
             function updateActiveCallsTable(activeCalls) {
                 var tbody = $('#activeCallsTable tbody');
                 tbody.empty();
@@ -99,6 +100,7 @@
                     tbody.append('<tr><td colspan="5">There are currently no active calls.</td></tr>');
                 }
             }
+            
             fetchActiveCalls();
             setInterval(fetchActiveCalls, 5000);
         });
