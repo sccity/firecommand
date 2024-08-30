@@ -23,7 +23,8 @@ mix.copy('node_modules/@fortawesome/fontawesome-free/webfonts/', 'public/assets/
 
 
 // core css
-var theme = 'transparent';
+//var theme = 'transparent';
+var theme = 'apple';
 mix.sass('resources/scss/'+ theme +'/styles.scss', 'public/assets/css/app.min.css');
 mix.copy('resources/scss/'+ theme +'/images/', 'public/assets/css/images/');
 

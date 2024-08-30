@@ -7,6 +7,7 @@
 <!-- ================== BEGIN BASE CSS STYLE ================== -->
 <link href="/assets/css/vendor.min.css" rel="stylesheet" />
 <link href="/assets/css/app.min.css" rel="stylesheet" />
+<link href="/assets/plugins/ionicons/css/ionicons.min.css" rel="stylesheet" />
 <!-- ================== END BASE CSS STYLE ================== -->
 
 @stack('css')

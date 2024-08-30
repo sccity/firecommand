@@ -25,7 +25,7 @@
 	
 	$appContentClass = (!empty($appContentClass)) ? $appContentClass : '';
 @endphp
-<body class="{{ $bodyClass }}">
+<body class="theme-red {{ $bodyClass }}">
 	<div class="app-cover"></div>
 
 	@include('includes.component.page-loader')

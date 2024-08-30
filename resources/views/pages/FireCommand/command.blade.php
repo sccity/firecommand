@@ -1,37 +1,34 @@
 @extends('layouts.default')
 
-@section('title', 'View Call')
+@section('title', 'IC')
 
 @push('css')
 <link href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css" rel="stylesheet">
 <style>
-/* General Styles */
 body {
-    background-color: #333; /* Dark background */
+    background-color: #333;
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    height: 100vh; /* Ensure full viewport height */
+    height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
-/* Main Layout */
 .container {
-    display: flex; /* Flexbox layout */
-    flex-direction: column; /* Stack vertically */
+    display: flex;
+    flex-direction: column;
     gap: 5px;
-    width: 100%; /* Full width */
-    height: 95vh; /* Fill most of the viewport height */
+    width: 100%;
+    height: 95vh;
     padding: 10px;
     box-sizing: border-box;
 }
 
-/* Header Layout */
 .header {
     display: grid;
-    grid-template-columns: repeat(10, 1fr); /* 10 equal columns */
+    grid-template-columns: repeat(10, 1fr);
     gap: 10px;
     align-items: center;
     color: white;
@@ -39,57 +36,52 @@ body {
     text-align: center;
 }
 
-/* Assignments Columns Layout */
 .assignments-columns {
     display: grid;
-    grid-template-columns: repeat(10, 1fr); /* 10 equal columns */
+    grid-template-columns: repeat(10, 1fr);
     gap: 10px;
     width: 100%;
-    height: 100%; /* Fill available height */
+    height: 100%;
 }
 
-/* Individual Column (Units and Assignments) */
 .column {
-    background-color: #444; /* Original color */
-    border: 1px solid #555; /* Original border */
+    background-color: #444;
+    border: 1px solid #555;
     padding: 25px;
     border-radius: 10px;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     justify-content: flex-start;
-    height: 100%; /* Fill available height */
+    height: 100%;
 }
 
-/* Column Header */
 .column h4 {
     font-size: 16px;
-    color: #ffffff; /* Original white text for headers */
+    color: #ffffff; 
     text-align: center;
     margin-bottom: 5px;
     width: 100%;
 }
 
-/* Unit Boxes */
 .box {
-    background-color: #555; /* Original box color */
+    background-color: #555;
     color: white;
     padding: 5px;
     margin-bottom: 5px;
     border-radius: 5px;
     cursor: pointer;
-    font-size: 14px; /* Slightly larger font */
+    font-size: 14px;
     width: 100%;
     text-align: center;
     display: flex;
     justify-content: center;
     align-items: center;
-    position: relative; /* To position the green dot */
+    position: relative;
 }
 
-/* Unit Box Header */
 .box .unit-header {
-    background-color: #FFCC00; /* Original yellow header */
+    background-color: #FFCC00;
     color: #333;
     padding: 10px;
     font-weight: bold;
@@ -97,25 +89,43 @@ body {
     width: 100%;
 }
 
-/* Green Dot */
 .green-dot {
     width: 10px;
     height: 10px;
-    background-color: #32CD32; /* Green color */
+    background-color: #32CD32;
     border-radius: 50%;
     position: absolute;
     top: 5px;
     left: 5px;
-    display: none; /* Initially hidden */
+}
+
+.red-dot {
+    width: 10px;
+    height: 10px;
+    background-color: #FF0000;
+    border-radius: 50%;
+    position: absolute;
+    top: 5px;
+    left: 5px;
+}
+
+.timer-flash {
+    color: #FF0000;
 }
 
 .assignment .box .green-dot {
-    display: block; /* Show green dot when in assignment column */
+    display: block;
 }
 
-/* Dragging effect */
 .dragging {
     opacity: 0.7;
+}
+
+.timer {
+    font-size: 48px;
+    font-weight: bold;
+    color: #FFCC00;
+    text-align: right;
 }
 
 </style>
@@ -144,31 +154,141 @@ body {
         });
     });
 </script>
+<script>
+    $(function() {
+        var timeoutDuration = 10; // Set the timeout duration here (in seconds)
+        var timerInterval;
+        var totalSeconds = 0;
+        var flashInterval;
+        var isFlashing = false;
+
+        function startTimer(display) {
+            timerInterval = setInterval(function () {
+                totalSeconds++;
+                var hours = Math.floor(totalSeconds / 3600);
+                var minutes = Math.floor((totalSeconds % 3600) / 60);
+                var seconds = totalSeconds % 60;
+
+                hours = hours < 10 ? "0" + hours : hours;
+                minutes = minutes < 10 ? "0" + minutes : minutes;
+                seconds = seconds < 10 ? "0" + seconds : seconds;
+
+                display.text(hours + ":" + minutes + ":" + seconds);
+
+                if (totalSeconds >= timeoutDuration) {
+                    startFlashingTimer(display);
+                    $('.assignment .box').each(function() {
+                        if (!$(this).data('manuallyReset')) {
+                            $(this).find('.green-dot').removeClass('green-dot').addClass('red-dot');
+                        }
+                    });
+                }
+            }, 1000);
+        }
+
+        function startFlashingTimer(display) {
+            if (isFlashing) return;
+            isFlashing = true;
+            flashInterval = setInterval(function() {
+                display.toggleClass('timer-flash');
+            }, 500);
+        }
+
+        function stopFlashingTimer(display) {
+            clearInterval(flashInterval);
+            isFlashing = false;
+            display.removeClass('timer-flash');
+        }
+
+        function resetTimer() {
+            clearInterval(timerInterval);
+            totalSeconds = 0;
+            $('#timer').text("00:00:00");
+            startTimer($('#timer'));
+
+            $('.assignment .box .red-dot').removeClass('red-dot').addClass('green-dot');
+            $('.assignment .box').removeData('manuallyReset');
+
+            stopFlashingTimer($('#timer'));
+        }
+
+        function resetDot() {
+            $(this).find('.red-dot').removeClass('red-dot').addClass('green-dot');
+            $(this).data('manuallyReset', true);
+
+            if ($('.assignment .box').length === $('.assignment .box .green-dot').length) {
+                resetTimer(); 
+            }
+        }
+
+        $(".box").draggable({
+            revert: "invalid",
+            helper: "original",
+            start: function(event, ui) {
+                $(this).data('originalContainer', $(this).parent());
+            }
+        });
+
+        $(".column").droppable({
+            accept: ".box",
+            drop: function(event, ui) {
+                var droppedBox = $(ui.draggable);
+                var targetContainer = $(this);
+                droppedBox.appendTo(targetContainer).css({ top: 'auto', left: 'auto', position: 'relative' });
+
+                if (!targetContainer.hasClass('available-units') && !targetContainer.hasClass('ic-column')) {
+                    droppedBox.find('.dot').remove();
+                    droppedBox.append('<div class="green-dot dot"></div>');
+                } else {
+                    droppedBox.find('.dot').remove();
+                }
+            }
+        });
+
+        $(document).on('click', '.box', resetDot);
+
+        startTimer($('#timer'));
+
+        $('#reset-timer').on('click', function() {
+            resetTimer();
+        });
+    });
+</script>
 @endpush
 
 @section('content')
 
 <div class="container">
     <h1>{{ $nature }} - {{ $address }}</h1>
-			<!-- BEGIN panel -->
-			<div class="panel panel-inverse" data-sortable-id="ui-widget-18" style="height: 200px;">
-				<div class="panel-heading">
-					<h4 class="panel-title">Call Details</h4>
-					<div class="panel-heading-btn">
-						<a href="javascript:;" class="btn btn-xs btn-icon btn-default" data-toggle="panel-expand"><i class="fa fa-expand"></i></a>
-						<a href="javascript:;" class="btn btn-xs btn-icon btn-success" data-toggle="panel-reload"><i class="fa fa-redo"></i></a>
-						<a href="javascript:;" class="btn btn-xs btn-icon btn-warning" data-toggle="panel-collapse"><i class="fa fa-minus"></i></a>
-						<a href="javascript:;" class="btn btn-xs btn-icon btn-danger" data-toggle="panel-remove"><i class="fa fa-times"></i></a>
-					</div>
-				</div>
-				<div class="panel-body bg-gray-800 text-white">
-					<p>Call information thats important and call timer can go here</p>
-				</div>
-				<div class="hljs-wrapper">
-					<pre><code class="html" data-url="/assets/data/ui-widget-boxes/code-18.json"></code></pre>
-				</div>
-			</div>
-			<!-- END panel -->
+	<!-- BEGIN row -->
+	<div class="row">
+		<!-- BEGIN col-3 -->
+		<div class="col-xl-3 col-md-6">
+		</div>
+		<!-- END col-3 -->
+		<!-- BEGIN col-3 -->
+		<div class="col-xl-3 col-md-6">
+		</div>
+		<!-- END col-3 -->
+		<!-- BEGIN col-3 -->
+		<div class="col-xl-3 col-md-6">
+		</div>
+		<!-- END col-3 -->
+		<!-- BEGIN col-3 -->
+        <div class="col-xl-3 col-md-6">
+            <div class="widget widget-stats bg-red">
+                <div class="stats-icon"></div>
+                <div class="stats-info" style="text-align: center;">
+                    <p id="timer" style="font-size: 40px; font-weight: bold;">00:00:00</p>	
+                </div>
+                <div class="stats-link" style="text-align: center;">
+                    <a href="javascript:;" id="reset-timer">Reset PAR</a>
+                </div>
+            </div>
+        </div>
+		<!-- END col-3 -->
+	</div>
+	<!-- END row -->
 			<!-- BEGIN panel -->
 			<div class="panel panel-inverse" data-sortable-id="ui-widget-18" style="height: 500px;">
 				<div class="panel-heading">
@@ -198,12 +318,12 @@ body {
 <!-- Columns (Units + Assignments) -->
 <div class="assignments-columns">
     <!-- Units Column -->
-    <div class="column">
+    <div class="column available-units">
         <div id="unassigned" class="flex flex-wrap gap-2">
             @foreach ($units as $unit)
             <div class="box">
                 <div class="unit-header">{{ $unit['unit'] }}</div>
-                <div class="green-dot"></div>
+                <!-- No dot here for available units -->
             </div>
             @endforeach
         </div>
@@ -211,7 +331,7 @@ body {
 
     <!-- Assignment Columns -->
     @foreach (['IC', 'FA', 'SEARCH', 'VENT', 'RIC', 'MED', 'STAGE', 'DIV A', 'DIV B'] as $assignment)
-    <div class="column assignment">
+    <div class="column @if($assignment == 'IC') ic-column @else assignment @endif">
         <div id="{{ strtolower(str_replace(' ', '_', $assignment)) }}" class="flex-grow"></div>
     </div>
     @endforeach
