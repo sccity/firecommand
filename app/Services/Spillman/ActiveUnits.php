@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Spillman;
 
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -36,10 +36,12 @@ class ActiveUnits
                 'url' => $apiUrl,
                 'response' => $response->body(),
             ]);
-            return [
-                'error' => 'No units found',
-                'url' => $apiUrl,
-                'call_id' => $call_id,
+            $units = [
+                [
+                    'unit' => 'ERR',
+                    'status' => 'Unknown',
+                    'elapsed' => 'Unknown',
+                ]
             ];
         }
 

@@ -2,15 +2,15 @@
 return [
     'menu' => [
         [
-            'icon' => 'fa fa-sitemap',
+            'icon' => 'fa fa-fire',
             'title' => 'Fire Command',
-            'url' => '/activecalls',
+            'url' => '/FireCommand/calls',
             'caret' => true,
             'sub_menu' => [
                 [
-                    'url' => '/activecalls',
+                    'url' => '/FireCommand/calls',
                     'title' => 'Active Calls',
-                    'route-name' => 'activecalls', // Ensure this matches your route name
+                    'route-name' => 'fc-calls',
                 ]
             ],
         ],

@@ -147,7 +147,9 @@ body {
 @endpush
 
 @section('content')
+
 <div class="container">
+    <h1>{{ $nature }} - {{ $address }}</h1>
 			<!-- BEGIN panel -->
 			<div class="panel panel-inverse" data-sortable-id="ui-widget-18" style="height: 200px;">
 				<div class="panel-heading">
@@ -232,7 +234,7 @@ body {
 					</div>
 				</div>
 				<div class="panel-body bg-gray-800 text-white">
-					<p>TBD</p>
+					{{!!$comments!!}}
 				</div>
 				<div class="hljs-wrapper">
 					<pre><code class="html" data-url="/assets/data/ui-widget-boxes/code-18.json"></code></pre>
