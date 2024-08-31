@@ -1,0 +1,172 @@
+body {
+    background-color: #333;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    width: 100%;
+    height: 95vh;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+.header {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    gap: 10px;
+    align-items: center;
+    color: white;
+    font-size: 18px;
+    text-align: center;
+}
+
+.assignments-columns {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    gap: 10px;
+    width: 100%;
+    height: 100%;
+}
+
+.header-column {
+    background-color: #333;
+    border: 1px solid #777;
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100px;
+    height: 50px;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+    text-transform: uppercase;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease, background-color 0.3s ease;
+    padding: 0 10px;
+}
+
+.column {
+    background-color: #444;
+    border: 1px solid #555;
+    padding: 8px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100px;
+    height: 350px;
+}
+
+.column h4 {
+    font-size: 16px;
+    color: #ffffff;
+    text-align: center;
+    margin-bottom: 5px;
+    width: 100%;
+}
+
+.box {
+    background-color: #4A4A4A;
+    color: white;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    width: 75px;
+    height: 50px;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-sizing: border-box;
+}
+
+.box:hover {
+    background-color: #575757;
+    transform: translateY(-2px);
+}
+
+.box .unit-header {
+    background-color: #FFCC00;
+    color: #333;
+    padding: 5px;
+    font-weight: bold;
+    border-radius: 8px;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 14px;
+}
+
+.unit-header {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    text-align: center;
+    font-weight: bold;
+}
+
+.unit-header small {
+    font-size: 0.9em;
+    font-weight: normal;
+    color: #666666;
+    margin-top: -2px;
+    line-height: 1.1;
+}
+
+.green-dot,
+.red-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    position: absolute;
+    top: 4px;
+    left: 4px;
+}
+
+.green-dot {
+    background-color: #32CD32;
+}
+
+.red-dot {
+    background-color: #FF0000;
+}
+
+.timer-flash {
+    color: #FF0000;
+}
+
+.assignment .box .green-dot {
+    display: block;
+}
+
+.dragging {
+    opacity: 0.7;
+}
+
+.timer {
+    font-size: 48px;
+    font-weight: bold;
+    color: #FFCC00;
+    text-align: right;
+}

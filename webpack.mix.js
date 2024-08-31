@@ -25,8 +25,8 @@ mix.copy('node_modules/@fortawesome/fontawesome-free/webfonts/', 'public/assets/
 // core css
 //var theme = 'transparent';
 var theme = 'apple';
-mix.sass('resources/scss/'+ theme +'/styles.scss', 'public/assets/css/app.min.css');
-mix.copy('resources/scss/'+ theme +'/images/', 'public/assets/css/images/');
+mix.sass('resources/scss/' + theme + '/styles.scss', 'public/assets/css/app.min.css');
+mix.copy('resources/scss/' + theme + '/images/', 'public/assets/css/images/');
 
 
 // vendor js
@@ -49,7 +49,7 @@ mix.combine([
 // demo js
 mix.copy(['resources/js/demo/'], 'public/assets/js/demo/');
 
-  	
+
 // plugins
 mix.copy('node_modules/@fortawesome', 'public/assets/plugins/@fortawesome');
 mix.copy('node_modules/@fullcalendar', 'public/assets/plugins/@fullcalendar');
