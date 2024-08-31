@@ -6,7 +6,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/4.5.6/css/ionicons-core.min.css" rel="stylesheet">
     <link href="https://api.mapbox.com/mapbox-gl-js/v3.6.0/mapbox-gl.css" rel="stylesheet">
-    <link href="{{ asset('css/fc-command.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/ic-command.css') }}" rel="stylesheet">
 @endpush
 
 @push('scripts')
@@ -15,9 +15,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js"></script>
     <script src="https://api.mapbox.com/mapbox-gl-js/v3.6.0/mapbox-gl.js"></script>
-    <script src="{{ asset('js/FireCommand/ic-par.js') }}"></script>
-    <script src="{{ asset('js/FireCommand/ic-interaction.js') }}"></script>
-    <script src="{{ asset('js/FireCommand/ic-updatedata.js') }}"></script>
+    <script src="{{ asset('js/ic/command-par.js') }}"></script>
+    <script src="{{ asset('js/ic/command-interaction.js') }}"></script>
+    <script src="{{ asset('js/ic/command-updatedata.js') }}"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             mapboxgl.accessToken =
@@ -48,7 +48,7 @@
 
 @section('content')
 
-    <div class="container">
+    <div class="container" data-call-id="{{ $call_id }}">
         <!-- BEGIN panel -->
         <div class="panel panel-inverse" data-sortable-id="ui-widget-18">
             <div class="panel-heading">
@@ -61,7 +61,8 @@
                 </div>
             </div>
             <div class="panel-body bg-gray-800 text-white">
-                <h1 style="text-transform: uppercase;">{{ $callnum }} {{ $nature }} - {{ $address }} - {{ $city }}/{{ $zone }}</h1>
+                <h1 style="text-transform: uppercase;">{{ $callnum }} {{ $nature }} - {{ $address }} -
+                    {{ $city }}/{{ $zone }}</h1>
                 <!-- BEGIN row -->
                 <div class="row" style="margin-left: 0; margin-right: 0;">
                     <!-- BEGIN col-9 for the map -->
@@ -152,7 +153,7 @@
                 </div>
             </div>
             <div class="panel-body bg-gray-800 text-white">
-                {!! str_replace(['{', '}'], '', $comments) !!}
+                <h4>{!! str_replace(['{', '}'], '', $comments) !!}</h4>
             </div>
             <div class="hljs-wrapper">
                 <pre><code class="html" data-url="/assets/data/ui-widget-boxes/code-18.json"></code></pre>

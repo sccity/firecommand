@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\FireCommand;
+namespace App\Http\Controllers\ic;
 
 use App\Http\Controllers\Controller;
 use App\Services\Spillman\ActiveCalls;
@@ -26,9 +26,9 @@ class Calls extends Controller
         $calls = $calls ?? [];
         
         if (empty($calls)) {
-            return view('pages/FireCommand/calls')->with('error', 'Failed to fetch active calls data');
+            return view('pages/ic/calls')->with('error', 'Failed to fetch active calls data');
         }
         
-        return view('pages/FireCommand/calls', ['calls' => $calls]);
+        return view('pages/ic/calls', ['calls' => $calls]);
     }
 }

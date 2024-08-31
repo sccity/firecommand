@@ -1,13 +1,13 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\FireCommand\Calls;
-use App\Http\Controllers\FireCommand\Command;
+use App\Http\Controllers\ic\Calls;
+use App\Http\Controllers\ic\Command;
 
 use Illuminate\Http\Request;
 Route::get('/', function () {
-	return redirect('/FireCommand/calls');
+	return redirect('/ic/calls');
 });
 
-Route::get('/FireCommand/calls', [Calls::class, 'index'])->name('fc-calls');
-Route::get('/FireCommand/command', [Command::class, 'index'])->name('fc-command');
+Route::get('/ic/calls', [Calls::class, 'index'])->name('ic-calls');
+Route::get('/ic/{call_id}', [Command::class, 'index'])->name('ic-command');

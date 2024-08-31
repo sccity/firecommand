@@ -1,14 +1,19 @@
 $(function () {
     const $container = $('.container');
     const callId = $container.data('call-id');
-    const updateUrl = $container.data('update-url');
+    console.log(callId);
+    const updateUrl = `/ic/${callId}`;
+
+    if (!callId) {
+        console.error("callId is undefined or empty.");
+        return;
+    }
 
     function refreshUnits() {
         $.ajax({
             url: updateUrl,
             method: 'GET',
             data: {
-                callid: callId,
                 units: true
             },
             success: function (data) {
@@ -45,11 +50,9 @@ $(function () {
             url: updateUrl,
             method: 'GET',
             data: {
-                callid: callId,
                 comments: true
             },
             success: function (data) {
-                // Assuming comments are returned as a string of HTML content
                 if (data.comments) {
                     $('.comments-container').html(data.comments);
                 }

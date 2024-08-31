@@ -70,12 +70,12 @@
 
             $('#activeCallsTable tbody').on('click', 'tr', function() {
                 var callId = $(this).data('call-id');
-                window.location.href = '/FireCommand/command?callid=' + callId;
+                window.location.href = '/ic/' + callId;
             });
 
             function fetchActiveCalls() {
                 $.ajax({
-                    url: '{{ route('fc-calls') }}',
+                    url: '{{ route('ic-calls') }}',
                     type: 'GET',
                     success: function(data) {
                         updateActiveCallsTable(data.calls);

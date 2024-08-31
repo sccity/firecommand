@@ -1,13 +1,12 @@
 <?php
 
-namespace App\Http\Controllers\FireCommand;
+namespace App\Http\Controllers\ic;
 
 use App\Http\Controllers\Controller;
 use App\Services\Spillman\ActiveCalls;
 use App\Services\Spillman\ActiveUnits;
 use App\Services\Spillman\Comments;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 
 class Command extends Controller
 {
@@ -22,25 +21,27 @@ class Command extends Controller
         $this->cadCommentsService = $cadCommentsService;
     }
 
-    public function index(Request $request)
+    public function index(Request $request, $call_id = null)
     {
-        $call_id = $request->query('callid');
-
+        // Redirect to calls page if no call ID is provided
         if (empty($call_id)) {
             return redirect()->route('fc-calls');
         }
 
+        // Fetch the necessary data
         $unitData = $this->activeUnitsService->getActiveUnits($call_id);
         $callData = $this->activeCallsService->getActiveCalls();
         $comments = $this->cadCommentsService->getCadComments($call_id);
 
+        // Check for errors or missing data
         if (isset($unitData['error']) || empty($callData) || isset($comments['error'])) {
-            return view('pages/FireCommand/command', [
+            return view('pages/ic/command', [
                 'error' => $unitData['error'] ?? $comments['error'] ?? 'Failed to fetch call data',
                 'call_id' => $call_id,
             ]);
         }
 
+        // Extract call details
         $callDetails = collect($callData)->firstWhere('call_id', $call_id);
 
         $nature = $callDetails['nature'] ?? 'Unknown';
@@ -51,9 +52,8 @@ class Command extends Controller
         $longitude = $callDetails['longitude'] ?? '0.0';
         $callnum = $callDetails['callnum'] ?? 'UNK';
 
+        // Fallback for units if none are provided
         $units = $unitData['units'] ?? [];
-
-        // Ensure units is not empty, return a single "UNK" unit if empty
         if (empty($units)) {
             $units = [
                 [
@@ -64,7 +64,7 @@ class Command extends Controller
             ];
         }
 
-        // Handle AJAX requests differently
+        // Handle AJAX requests specifically for units and comments
         if ($request->ajax()) {
             if ($request->has('units')) {
                 return response()->json(['units' => $units]);
@@ -75,16 +75,16 @@ class Command extends Controller
             }
         }
 
-        // Standard request returns the full view
-        return view('pages/FireCommand/command', [
+        // Handle full view rendering for non-AJAX requests
+        return view('pages/ic/command', [
             'units' => $units,
             'call_id' => $call_id,
             'nature' => $nature,
             'address' => $address,
             'city' => $city,
             'zone' => $zone,
-            'latitude' => (float) $callDetails['latitude'] ?? 0.0,
-            'longitude' => (float) $callDetails['longitude'] ?? 0.0,
+            'latitude' => (float) $latitude,
+            'longitude' => (float) $longitude,
             'comments' => $comments,
             'callnum' => $callnum,
         ]);
