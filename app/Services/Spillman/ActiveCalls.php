@@ -16,7 +16,7 @@ class ActiveCalls
 
     public function getActiveCalls()
     {
-        $apiUrl = config('services.api.url') . '/active?&token=' . config('services.api.token');
+        $apiUrl = config('services.api.url') . '/cad/active?&token=' . config('services.api.token');
         $response = Http::withHeaders([
             'Cache-Control' => 'no-cache, no-store, must-revalidate',
             'Pragma' => 'no-cache',

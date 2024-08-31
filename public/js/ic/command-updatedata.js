@@ -54,7 +54,9 @@ $(function () {
             },
             success: function (data) {
                 if (data.comments) {
-                    $('.comments-container').html(data.comments);
+                    $('.panel-body h4').html(data.comments);
+                } else {
+                    console.warn('No comments in response');
                 }
             },
             error: function (xhr, status, error) {

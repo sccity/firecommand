@@ -9,7 +9,7 @@ class Comments
 {
     public function getCadComments($call_id)
     {
-        $apiUrl = config('services.api.url') . '/comments?callid=' . $call_id . '&token=' . config('services.api.token');
+        $apiUrl = config('services.api.url') . '/cad/comments?callid=' . $call_id . '&token=' . config('services.api.token');
         $response = Http::withHeaders([
             'Cache-Control' => 'no-cache, no-store, must-revalidate',
             'Pragma' => 'no-cache',

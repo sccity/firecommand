@@ -23,17 +23,14 @@ class Command extends Controller
 
     public function index(Request $request, $call_id = null)
     {
-        // Redirect to calls page if no call ID is provided
         if (empty($call_id)) {
             return redirect()->route('fc-calls');
         }
 
-        // Fetch the necessary data
         $unitData = $this->activeUnitsService->getActiveUnits($call_id);
         $callData = $this->activeCallsService->getActiveCalls();
         $comments = $this->cadCommentsService->getCadComments($call_id);
 
-        // Check for errors or missing data
         if (isset($unitData['error']) || empty($callData) || isset($comments['error'])) {
             return view('pages/ic/command', [
                 'error' => $unitData['error'] ?? $comments['error'] ?? 'Failed to fetch call data',
@@ -41,7 +38,6 @@ class Command extends Controller
             ]);
         }
 
-        // Extract call details
         $callDetails = collect($callData)->firstWhere('call_id', $call_id);
 
         $nature = $callDetails['nature'] ?? 'Unknown';
@@ -52,7 +48,6 @@ class Command extends Controller
         $longitude = $callDetails['longitude'] ?? '0.0';
         $callnum = $callDetails['callnum'] ?? 'UNK';
 
-        // Fallback for units if none are provided
         $units = $unitData['units'] ?? [];
         if (empty($units)) {
             $units = [
@@ -64,7 +59,6 @@ class Command extends Controller
             ];
         }
 
-        // Handle AJAX requests specifically for units and comments
         if ($request->ajax()) {
             if ($request->has('units')) {
                 return response()->json(['units' => $units]);
@@ -75,7 +69,6 @@ class Command extends Controller
             }
         }
 
-        // Handle full view rendering for non-AJAX requests
         return view('pages/ic/command', [
             'units' => $units,
             'call_id' => $call_id,

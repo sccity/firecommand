@@ -9,7 +9,7 @@ class ActiveUnits
 {
     public function getActiveUnits($call_id)
     {
-        $apiUrl = config('services.api.url') . '/active/units?callid=' . $call_id . '&token=' . config('services.api.token');
+        $apiUrl = config('services.api.url') . '/cad/active/units?callid=' . $call_id . '&token=' . config('services.api.token');
         $response = Http::withHeaders([
             'Cache-Control' => 'no-cache, no-store, must-revalidate',
             'Pragma' => 'no-cache',
