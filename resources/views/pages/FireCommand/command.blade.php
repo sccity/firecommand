@@ -5,6 +5,7 @@
 @push('css')
     <link href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/4.5.6/css/ionicons-core.min.css" rel="stylesheet">
+    <link href="https://api.mapbox.com/mapbox-gl-js/v3.6.0/mapbox-gl.css" rel="stylesheet">
     <link href="{{ asset('css/fc-command.css') }}" rel="stylesheet">
 @endpush
 
@@ -13,44 +14,83 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/interact.js/1.0.2/interact.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js"></script>
+    <script src="https://api.mapbox.com/mapbox-gl-js/v3.6.0/mapbox-gl.js"></script>
     <script src="{{ asset('js/FireCommand/ic-par.js') }}"></script>
     <script src="{{ asset('js/FireCommand/ic-interaction.js') }}"></script>
     <script src="{{ asset('js/FireCommand/ic-updatedata.js') }}"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            mapboxgl.accessToken =
+                'pk.eyJ1IjoibGhheW5pZSIsImEiOiJjbGQzbG80b3cwams3M3BqcjJ1YjZjZTVhIn0.OhMTetZePiPzigNNL-yhyQ';
+            var latitude = @json($latitude);
+            var longitude = @json($longitude);
+
+            var map = new mapboxgl.Map({
+                container: 'map',
+                style: 'mapbox://styles/lhaynie/cleopgxcc000f01mq65j5rfiw',
+                center: [longitude, latitude],
+                zoom: 17
+            });
+
+            var el = document.createElement('div');
+            el.style.width = '30px';
+            el.style.height = '30px';
+            el.style.backgroundColor = 'red';
+            el.style.borderRadius = '50%';
+            el.style.border = '2px solid white';
+
+            new mapboxgl.Marker(el)
+                .setLngLat([longitude, latitude])
+                .addTo(map);
+        });
+    </script>
 @endpush
 
 @section('content')
 
     <div class="container">
-        <h1>{{ $nature }} - {{ $address }}</h1>
-        <!-- BEGIN row -->
-        <div class="row">
-            <!-- BEGIN col-3 -->
-            <div class="col-xl-3 col-md-6">
-            </div>
-            <!-- END col-3 -->
-            <!-- BEGIN col-3 -->
-            <div class="col-xl-3 col-md-6">
-            </div>
-            <!-- END col-3 -->
-            <!-- BEGIN col-3 -->
-            <div class="col-xl-3 col-md-6">
-            </div>
-            <!-- END col-3 -->
-            <!-- BEGIN col-3 -->
-            <div class="col-xl-3 col-md-6">
-                <div class="widget widget-stats bg-red">
-                    <div class="stats-icon"></div>
-                    <div class="stats-info" style="text-align: center;">
-                        <p id="timer" style="font-size: 40px; font-weight: bold;">00:00:00</p>
-                    </div>
-                    <div class="stats-link" style="text-align: center;">
-                        <a href="javascript:;" id="reset-timer">Reset PAR</a>
-                    </div>
+        <!-- BEGIN panel -->
+        <div class="panel panel-inverse" data-sortable-id="ui-widget-18">
+            <div class="panel-heading">
+                <h4 class="panel-title">Incident Details</h4>
+                <div class="panel-heading-btn">
+                    <a href="javascript:;" class="btn btn-xs btn-icon btn-default" data-toggle="panel-expand"><i
+                            class="fa fa-expand"></i></a>
+                    <a href="javascript:;" class="btn btn-xs btn-icon btn-warning" data-toggle="panel-collapse"><i
+                            class="fa fa-minus"></i></a>
                 </div>
             </div>
-            <!-- END col-3 -->
+            <div class="panel-body bg-gray-800 text-white">
+                <h1 style="text-transform: uppercase;">{{ $callnum }} {{ $nature }} - {{ $address }} - {{ $city }}/{{ $zone }}</h1>
+                <!-- BEGIN row -->
+                <div class="row" style="margin-left: 0; margin-right: 0;">
+                    <!-- BEGIN col-9 for the map -->
+                    <div id="map" class="col-xl-9 col-md-12" style="height: 300px;"></div>
+                    <!-- END col-9 -->
+
+                    <!-- BEGIN col-3 for the timer -->
+                    <div class="col-xl-3 col-md-6">
+                        <div class="widget widget-stats bg-red">
+                            <div class="stats-icon"></div>
+                            <div class="stats-info" style="text-align: center;">
+                                <p id="timer" style="font-size: 40px; font-weight: bold;">00:00:00</p>
+                            </div>
+                            <div class="stats-link" style="text-align: center;">
+                                <a href="javascript:;" id="reset-timer">
+                                    <center>Reset PAR</center>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- END col-3 -->
+                </div>
+                <!-- END row -->
+            </div>
+            <div class="hljs-wrapper">
+                <pre><code class="html" data-url="/assets/data/ui-widget-boxes/code-18.json"></code></pre>
+            </div>
         </div>
-        <!-- END row -->
+        <!-- END panel -->
         <!-- BEGIN panel -->
         <div class="panel panel-inverse" data-sortable-id="ui-widget-18">
             <div class="panel-heading">

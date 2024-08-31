@@ -175,6 +175,8 @@ body {
     display: none !important;
 }
 
-.pace, .pace-inactive, .pace-active {
+.pace,
+.pace-inactive,
+.pace-active {
     display: none !important;
 }
