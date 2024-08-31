@@ -4,6 +4,8 @@
 
 @push('css')
     <link href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/4.5.6/css/ionicons-core.min.css" rel="stylesheet">
+    
     <style>
         body {
             background-color: #333;
@@ -132,120 +134,55 @@
 
 @push('scripts')
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@interactjs/interactjs@1.10.11/dist/interact.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@interactjs/interactjs@1.10.11/dist/interact.min.js"></script>
     <script>
         $(function() {
-            $(".box").draggable({
-                revert: "invalid",
-                helper: "original",
-                start: function(event, ui) {
-                    $(this).data('originalContainer', $(this).parent());
-                }
-            });
+            var isDragging = false;
 
-            $(".column").droppable({
-                accept: ".box",
-                drop: function(event, ui) {
-                    var droppedBox = $(ui.draggable);
-                    var targetContainer = $(this);
-                    droppedBox.appendTo(targetContainer).css({
-                        top: 'auto',
-                        left: 'auto',
-                        position: 'relative'
-                    });
-                }
-            });
-        });
-    </script>
-    <script>
-        $(function() {
-            var timeoutDuration = 10; // Set the timeout duration here (in seconds)
-            var timerInterval;
-            var totalSeconds = 0;
-            var flashInterval;
-            var isFlashing = false;
+            // Initialize interact.js for drag-and-drop
+            interact('.box').draggable({
+                inertia: true,
+                autoScroll: true,
+                listeners: {
+                    start(event) {
+                        isDragging = true;
+                    },
+                    move(event) {
+                        const target = event.target;
+                        const x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
+                        const y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
 
-            function startTimer(display) {
-                timerInterval = setInterval(function() {
-                    totalSeconds++;
-                    var hours = Math.floor(totalSeconds / 3600);
-                    var minutes = Math.floor((totalSeconds % 3600) / 60);
-                    var seconds = totalSeconds % 60;
+                        target.style.transform = `translate(${x}px, ${y}px)`;
 
-                    hours = hours < 10 ? "0" + hours : hours;
-                    minutes = minutes < 10 ? "0" + minutes : minutes;
-                    seconds = seconds < 10 ? "0" + seconds : seconds;
-
-                    display.text(hours + ":" + minutes + ":" + seconds);
-
-                    if (totalSeconds >= timeoutDuration) {
-                        startFlashingTimer(display);
-                        $('.assignment .box').each(function() {
-                            if (!$(this).data('manuallyReset')) {
-                                $(this).find('.green-dot').removeClass('green-dot').addClass(
-                                    'red-dot');
-                            }
-                        });
+                        target.setAttribute('data-x', x);
+                        target.setAttribute('data-y', y);
+                    },
+                    end(event) {
+                        isDragging = false;
                     }
-                }, 1000);
-            }
-
-            function startFlashingTimer(display) {
-                if (isFlashing) return;
-                isFlashing = true;
-                flashInterval = setInterval(function() {
-                    display.toggleClass('timer-flash');
-                }, 500);
-            }
-
-            function stopFlashingTimer(display) {
-                clearInterval(flashInterval);
-                isFlashing = false;
-                display.removeClass('timer-flash');
-            }
-
-            function resetTimer() {
-                clearInterval(timerInterval);
-                totalSeconds = 0;
-                $('#timer').text("00:00:00");
-                startTimer($('#timer'));
-
-                $('.assignment .box .red-dot').removeClass('red-dot').addClass('green-dot');
-                $('.assignment .box').removeData('manuallyReset');
-
-                stopFlashingTimer($('#timer'));
-            }
-
-            function resetDot() {
-                $(this).find('.red-dot').removeClass('red-dot').addClass('green-dot');
-                $(this).data('manuallyReset', true);
-
-                if ($('.assignment .box').length === $('.assignment .box .green-dot').length) {
-                    resetTimer();
-                }
-            }
-
-            $(".box").draggable({
-                revert: "invalid",
-                helper: "original",
-                start: function(event, ui) {
-                    $(this).data('originalContainer', $(this).parent());
                 }
             });
 
-            $(".column").droppable({
-                accept: ".box",
-                drop: function(event, ui) {
-                    var droppedBox = $(ui.draggable);
-                    var targetContainer = $(this);
+            interact('.column').dropzone({
+                accept: '.box',
+                overlap: 0.5,
+                ondrop(event) {
+                    const droppedBox = $(event.relatedTarget);
+                    const targetContainer = $(event.target);
+
                     droppedBox.appendTo(targetContainer).css({
                         top: 'auto',
                         left: 'auto',
-                        position: 'relative'
+                        transform: 'none'
                     });
 
-                    if (!targetContainer.hasClass('available-units') && !targetContainer.hasClass(
-                            'ic-column')) {
+                    droppedBox.attr('data-x', 0).attr('data-y', 0);
+
+                    if (!targetContainer.hasClass('available-units') && !targetContainer.hasClass('ic-column')) {
                         droppedBox.find('.dot').remove();
                         droppedBox.append('<div class="green-dot dot"></div>');
                     } else {
@@ -254,91 +191,28 @@
                 }
             });
 
-            $(document).on('click', '.box', resetDot);
+            // Handle click/tap for toggling the dot
+            $(document).on('click', '.box', function() {
+                if (!isDragging) {
+                    var dot = $(this).find('.dot');
+                    if (dot.hasClass('red-dot')) {
+                        dot.removeClass('red-dot').addClass('green-dot');
+                    }
+                    $(this).data('manuallyReset', true);
 
-            startTimer($('#timer'));
-
-            $('#reset-timer').on('click', function() {
-                resetTimer();
+                    if ($('.assignment .box').length === $('.assignment .box .green-dot').length) {
+                        resetTimer();
+                    }
+                }
             });
+
+            // Function to reset the timer (add your existing logic here)
+            function resetTimer() {
+                // Your existing timer reset logic
+            }
         });
     </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
     <script>
-        $(function() {
-            $(".box").draggable({
-                revert: "invalid",
-                helper: "original",
-                start: function(event, ui) {
-                    $(this).data('originalContainer', $(this).parent());
-                }
-            });
-
-            $(".column").droppable({
-                accept: ".box",
-                drop: function(event, ui) {
-                    var droppedBox = $(ui.draggable);
-                    var targetContainer = $(this);
-                    droppedBox.appendTo(targetContainer).css({
-                        top: 'auto',
-                        left: 'auto',
-                        position: 'relative'
-                    });
-                }
-            });
-
-            // AJAX call to refresh units
-            function refreshUnits() {
-                $.ajax({
-                    url: '{{ url()->current() }}', // Calls the current route
-                    method: 'GET',
-                    data: {
-                        callid: '{{ $call_id }}',
-                        units: true
-                    }, // Passing the callid and units parameter
-                    success: function(data) {
-                        data.units.forEach(function(unit) {
-                            // Check if the unit already exists in any column
-                            if (!$('#' + unit.id).length) {
-                                // Unit does not exist, add it to the available units column
-                                $('#unassigned').append(
-                                    '<div class="box" id="' + unit.id + '">' +
-                                    '<div class="unit-header">' + unit.unit + '</div>' +
-                                    '</div>'
-                                );
-                            } else {
-                                // If the unit exists, update its header text (if needed)
-                                $('#' + unit.id).find('.unit-header').text(unit.unit);
-                            }
-                        });
-                    }
-                });
-            }
-        }
-
-        // AJAX call to refresh comments
-        function refreshComments() {
-            $.ajax({
-                url: '{{ url()->current() }}', // Calls the current route
-                method: 'GET',
-                data: {
-                    callid: '{{ $call_id }}',
-                    comments: true
-                }, // Passing the callid and comments parameter
-                success: function(data) {
-                    $('.comments-container').html(data
-                        .comments); // Update only the comments container
-                }
-            });
-        }
-
-        // Set intervals to refresh units and comments
-        setInterval(refreshUnits, 5000); // Refresh units every 5 seconds
-        setInterval(refreshComments, 5000); // Refresh comments every 5 seconds
-        });
-
-        // Existing timer logic (unchanged)
         $(function() {
             var timeoutDuration = 10; // Set the timeout duration here (in seconds)
             var timerInterval;
