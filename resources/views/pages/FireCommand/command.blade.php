@@ -46,16 +46,41 @@
             height: 100%;
         }
 
+        .header-column {
+            background-color: #333;
+            border: 1px solid #777;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100px;
+            height: 50px;
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            text-transform: uppercase;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, background-color 0.3s ease;
+            padding: 0 10px;
+        }
+
         .column {
             background-color: #444;
             border: 1px solid #555;
-            padding: 25px;
+            padding: 8px;
             border-radius: 10px;
             display: flex;
             flex-direction: column;
-            align-items: flex-start;
+            align-items: center;
+            /* Center child elements horizontally */
             justify-content: flex-start;
-            height: 100%;
+            width: 100px;
+            /* Fixed width */
+            height: 350px;
+            /* Fixed height */
         }
 
         .column h4 {
@@ -379,29 +404,23 @@
         </div>
         <!-- END row -->
         <!-- BEGIN panel -->
-        <div class="panel panel-inverse" data-sortable-id="ui-widget-18" style="height: 500px;">
+        <div class="panel panel-inverse" data-sortable-id="ui-widget-18">
             <div class="panel-heading">
                 <h4 class="panel-title">Unit Assignments</h4>
-                <div class="panel-heading-btn">
-                    <a href="javascript:;" class="btn btn-xs btn-icon btn-default" data-toggle="panel-expand"><i
-                            class="fa fa-expand"></i></a>
-                    <a href="javascript:;" class="btn btn-xs btn-icon btn-warning" data-toggle="panel-collapse"><i
-                            class="fa fa-minus"></i></a>
-                </div>
             </div>
             <div class="panel-body bg-gray-800 text-white">
                 <!-- Header -->
                 <div class="header">
-                    <h4>Units</h4>
-                    <h4>IC</h4>
-                    <h4>FA</h4>
-                    <h4>SEARCH</h4>
-                    <h4>VENT</h4>
-                    <h4>RIC</h4>
-                    <h4>MED</h4>
-                    <h4>STAGE</h4>
-                    <h4>DIV A</h4>
-                    <h4>DIV B</h4>
+                    <div class="header-column">Units</div>
+                    <div class="header-column">IC</div>
+                    <div class="header-column">FA</div>
+                    <div class="header-column">SEARCH</div>
+                    <div class="header-column">VENT</div>
+                    <div class="header-column">RIC</div>
+                    <div class="header-column">MED</div>
+                    <div class="header-column">STAGE</div>
+                    <div class="header-column">DIV A</div>
+                    <div class="header-column">DIV B</div>
                 </div>
 
                 <!-- Columns (Units + Assignments) -->
@@ -432,7 +451,7 @@
         </div>
         <!-- END panel -->
         <!-- BEGIN panel -->
-        <div class="panel panel-inverse" data-sortable-id="ui-widget-18" style="height: 300px;">
+        <div class="panel panel-inverse" data-sortable-id="ui-widget-18">
             <div class="panel-heading">
                 <h4 class="panel-title">CAD Comments</h4>
                 <div class="panel-heading-btn">
