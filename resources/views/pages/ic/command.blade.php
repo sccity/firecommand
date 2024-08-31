@@ -18,6 +18,7 @@
     <script src="{{ asset('js/ic/command-par.js') }}"></script>
     <script src="{{ asset('js/ic/command-interaction.js') }}"></script>
     <script src="{{ asset('js/ic/command-updatedata.js') }}"></script>
+    <script src="{{ asset('js/ic/command-assignments.js') }}"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             mapboxgl.accessToken =
@@ -82,6 +83,17 @@
                                 </a>
                             </div>
                         </div>
+                        <div class="form-group mt-3" style="text-align: center;">
+                            <label for="incident-type-dropdown">Incident Type</label>
+                            <select class="form-control" id="incident-type-dropdown">
+                                <option value="Structure Fire">Structure Fire</option>
+                                <option value="Brush Fire">Brush Fire</option>
+                                <option value="Other Fire">Other Fire</option>
+                                <option value="Medical">Medical</option>
+                                <option value="MCI">MCI</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
                     </div>
                     <!-- END col-3 -->
                 </div>
@@ -105,15 +117,15 @@
                     <div class="header-column">FA</div>
                     <div class="header-column">SEARCH</div>
                     <div class="header-column">VENT</div>
-                    <div class="header-column">RIC</div>
+                    <div class="header-column">RIT</div>
                     <div class="header-column">MED</div>
-                    <div class="header-column">STAGE</div>
+                    <div class="header-column">DRONE</div>
                     <div class="header-column">DIV A</div>
                     <div class="header-column">DIV B</div>
                 </div>
 
                 <!-- Columns (Units + Assignments) -->
-                <div class="assignments-columns">
+                <div class="assignments-columns" id="assignments-columns">
                     <!-- Units Column -->
                     <div class="column available-units">
                         <div id="unassigned" class="flex flex-wrap gap-2">
@@ -127,13 +139,7 @@
                             @endforeach
                         </div>
                     </div>
-
-                    <!-- Assignment Columns -->
-                    @foreach (['IC', 'FA', 'SEARCH', 'VENT', 'RIC', 'MED', 'STAGE', 'DIV A', 'DIV B'] as $assignment)
-                        <div class="column @if ($assignment == 'IC') ic-column @else assignment @endif">
-                            <div id="{{ strtolower(str_replace(' ', '_', $assignment)) }}" class="flex-grow"></div>
-                        </div>
-                    @endforeach
+                    <!-- Assignment Columns will be dynamically added here -->
                 </div>
             </div>
             <div class="hljs-wrapper">
