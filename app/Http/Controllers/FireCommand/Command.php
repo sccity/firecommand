@@ -43,27 +43,41 @@ class Command extends Controller
     
         $callDetails = collect($callData)->firstWhere('call_id', $call_id);
     
+        // Ensure callDetails is not null
         if (!$callDetails) {
-            return view('pages/FireCommand/command', [
-                'error' => 'Call details not found',
-                'call_id' => $call_id,
-            ]);
+            $nature = 'Unknown';
+            $address = 'Unknown';
+        } else {
+            // Ensure nature and address are not empty/null
+            $nature = $callDetails['nature'] ?? 'Unknown';
+            $address = $callDetails['address'] ?? 'Unknown';
         }
     
-        $nature = $callDetails['nature'] ?? 'Unknown';
-        $address = $callDetails['address'] ?? 'Unknown';
-    
         $units = $unitData['units'] ?? [];
+    
+        // Ensure units is not empty, return a single "UNK" unit if empty
         if (empty($units)) {
             $units = [
                 [
-                    'unit' => 'ERR',
+                    'unit' => 'TBD',
                     'status' => 'Unknown',
                     'elapsed' => 'Unknown',
                 ]
             ];
         }
     
+        // Handle AJAX requests differently
+        if ($request->ajax()) {
+            if ($request->has('units')) {
+                return response()->json(['units' => $units]);
+            }
+    
+            if ($request->has('comments')) {
+                return response()->json(['comments' => $comments]);
+            }
+        }
+    
+        // Standard request returns the full view
         return view('pages/FireCommand/command', [
             'units' => $units,
             'call_id' => $call_id,

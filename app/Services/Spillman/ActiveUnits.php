@@ -38,7 +38,7 @@ class ActiveUnits
             ]);
             $units = [
                 [
-                    'unit' => 'ERR',
+                    'unit' => 'TBD',
                     'status' => 'Unknown',
                     'elapsed' => 'Unknown',
                 ]
