@@ -21,9 +21,9 @@ $(function() {
             if (totalSeconds >= timeoutDuration) {
                 startFlashingTimer(display);
                 $('.assignment .box').each(function() {
-                    if (!$(this).data('manuallyReset')) {
-                        $(this).find('.green-dot').removeClass('green-dot').addClass(
-                            'red-dot');
+                    var box = $(this);
+                    if (!box.data('manuallyReset')) {
+                        box.find('.green-dot').removeClass('green-dot').addClass('red-dot');
                     }
                 });
             }
@@ -57,10 +57,11 @@ $(function() {
     }
 
     function resetDot() {
-        $(this).find('.red-dot').removeClass('red-dot').addClass('green-dot');
-        $(this).data('manuallyReset', true);
+        var box = $(this);
+        box.find('.red-dot').removeClass('red-dot').addClass('green-dot');
+        box.data('manuallyReset', true);
 
-        if ($('.assignment .box').length === $('.assignment .box .green-dot').length) {
+        if ($('.assignment .box .red-dot').length === 0) {
             resetTimer();
         }
     }
@@ -84,8 +85,7 @@ $(function() {
                 position: 'relative'
             });
 
-            if (!targetContainer.hasClass('available-units') && !targetContainer.hasClass(
-                    'ic-column')) {
+            if (!targetContainer.hasClass('available-units') && !targetContainer.hasClass('ic-column')) {
                 droppedBox.find('.dot').remove();
                 droppedBox.append('<div class="green-dot dot"></div>');
             } else {

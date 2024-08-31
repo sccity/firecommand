@@ -170,3 +170,11 @@ body {
     color: #FFCC00;
     text-align: right;
 }
+
+#loader {
+    display: none !important;
+}
+
+.pace, .pace-inactive, .pace-active {
+    display: none !important;
+}

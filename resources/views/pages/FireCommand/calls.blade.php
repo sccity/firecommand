@@ -18,6 +18,16 @@
             font-size: 16px !important;
             padding: 15px 8px !important;
         }
+
+        #loader {
+            display: none !important;
+        }
+
+        .pace,
+        .pace-inactive,
+        .pace-active {
+            display: none !important;
+        }
     </style>
 @endpush
 
@@ -57,12 +67,12 @@
                 searching: false,
                 ordering: false,
             });
-    
+
             $('#activeCallsTable tbody').on('click', 'tr', function() {
                 var callId = $(this).data('call-id');
                 window.location.href = '/FireCommand/command?callid=' + callId;
             });
-    
+
             function fetchActiveCalls() {
                 $.ajax({
                     url: '{{ route('fc-calls') }}',
@@ -75,7 +85,7 @@
                     }
                 });
             }
-    
+
             function updateActiveCallsTable(calls) {
                 var tbody = $('#activeCallsTable tbody');
                 tbody.empty();
@@ -95,7 +105,7 @@
                 }
                 $('#activeCallsTable').DataTable().draw();
             }
-    
+
             fetchActiveCalls();
             setInterval(fetchActiveCalls, 5000);
         });
