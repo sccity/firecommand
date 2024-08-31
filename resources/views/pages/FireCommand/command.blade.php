@@ -5,7 +5,7 @@
 @push('css')
     <link href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/4.5.6/css/ionicons-core.min.css" rel="stylesheet">
-    
+
     <style>
         body {
             background-color: #333;
@@ -67,48 +67,72 @@
         }
 
         .box {
-            background-color: #555;
+            background-color: #4A4A4A;
+            /* Slightly lighter background for a modern look */
             color: white;
-            padding: 5px;
-            margin-bottom: 5px;
-            border-radius: 5px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            /* Rounded corners on all sides */
             cursor: pointer;
-            font-size: 14px;
-            width: 100%;
+            width: 75px;
+            /* Fixed width */
+            height: 50px;
+            /* Fixed height */
             text-align: center;
             display: flex;
             justify-content: center;
             align-items: center;
             position: relative;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            /* Soft shadow for a modern touch */
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            /* Smooth hover effect */
+            box-sizing: border-box;
+            /* Ensure padding is included within the fixed size */
+        }
+
+        .box:hover {
+            background-color: #575757;
+            /* Darker background on hover */
+            transform: translateY(-2px);
+            /* Slight lift on hover */
         }
 
         .box .unit-header {
             background-color: #FFCC00;
             color: #333;
-            padding: 10px;
+            padding: 5px;
             font-weight: bold;
-            border-bottom: 1px solid #666;
+            border-radius: 8px;
+            /* Rounded corners to match the box */
             width: 100%;
+            height: 100%;
+            /* Fill the box size */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 14px;
+            /* Adjust font size to fit the smaller box */
+        }
+
+        .green-dot,
+        .red-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            position: absolute;
+            top: 4px;
+            left: 4px;
         }
 
         .green-dot {
-            width: 10px;
-            height: 10px;
             background-color: #32CD32;
-            border-radius: 50%;
-            position: absolute;
-            top: 5px;
-            left: 5px;
+            /* Green color */
         }
 
         .red-dot {
-            width: 10px;
-            height: 10px;
             background-color: #FF0000;
-            border-radius: 50%;
-            position: absolute;
-            top: 5px;
-            left: 5px;
+            /* Red color */
         }
 
         .timer-flash {
@@ -182,7 +206,8 @@
 
                     droppedBox.attr('data-x', 0).attr('data-y', 0);
 
-                    if (!targetContainer.hasClass('available-units') && !targetContainer.hasClass('ic-column')) {
+                    if (!targetContainer.hasClass('available-units') && !targetContainer.hasClass(
+                            'ic-column')) {
                         droppedBox.find('.dot').remove();
                         droppedBox.append('<div class="green-dot dot"></div>');
                     } else {
