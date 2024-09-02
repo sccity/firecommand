@@ -17,7 +17,7 @@ class ActiveUnits
         ])->get($apiUrl);
 
         if ($response->failed()) {
-            Log::error('API request failed', [
+            Log::error('Spillman API Request Failed', [
                 'url' => $apiUrl,
                 'response' => $response->body(),
             ]);
@@ -29,10 +29,9 @@ class ActiveUnits
         }
 
         $units = $response->json();
-        Log::info('API response', ['data' => $units]);
 
         if (empty($units)) {
-            Log::warning('No units found', [
+            Log::warning('No Units Found', [
                 'url' => $apiUrl,
                 'response' => $response->body(),
             ]);

@@ -17,7 +17,7 @@ class Comments
         ])->get($apiUrl);
 
         if ($response->failed()) {
-            Log::error('API request failed', [
+            Log::error('Spillman API Request Failed', [
                 'url' => $apiUrl,
                 'response' => $response->body(),
             ]);
@@ -25,12 +25,11 @@ class Comments
         }
 
         $data = $response->json();
-        Log::info('API response', ['data' => $data]);
 
         $comments = $data[0]['comments'] ?? null;
 
         if (empty($comments)) {
-            Log::warning('No comments found', [
+            Log::warning('No Comments Found', [
                 'url' => $apiUrl,
                 'response' => $response->body(),
             ]);
