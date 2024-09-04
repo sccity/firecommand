@@ -18,113 +18,16 @@
     <script src="{{ asset('js/ic/command-interaction.js') }}"></script>
     <script src="{{ asset('js/ic/command-updatedata.js') }}"></script>
     <script src="{{ asset('js/ic/command-assignments.js') }}"></script>
-    
     <script>
-document.addEventListener("DOMContentLoaded", function () {
-    const callId = document.querySelector('.container').dataset.callId;
-    const headerRow = document.querySelector('.header');
-
-    function loadColumns() {
-        fetch(`/columns/${callId}`)
-            .then(response => response.json())
-            .then(data => {
-                if (Array.isArray(data)) { // Ensure the data is an array
-                    renderColumns(data);
-                    enableHeaderEditing();
-                } else {
-                    console.error('Unexpected data format:', data);
-                }
-            })
-            .catch(error => {
-                console.error('Error loading columns:', error);
-            });
-    }
-
-    function renderColumns(columns) {
-        // Clear existing columns
-        headerRow.innerHTML = '';
-
-        columns.forEach(columnName => {
-            if (columnName) { // Check if columnName is not empty
-                const headerDiv = document.createElement('div');
-                headerDiv.className = 'header-column';
-                headerDiv.textContent = columnName;
-                headerRow.appendChild(headerDiv);
-            }
-        });
-    }
-
-    function enableHeaderEditing() {
-        const headerColumns = headerRow.querySelectorAll('.header-column');
-        headerColumns.forEach(header => {
-            header.addEventListener('click', function () {
-                const currentText = header.textContent;
-                const input = document.createElement('input');
-                input.type = 'text';
-                input.value = currentText;
-                input.style.width = `${header.offsetWidth}px`;
-
-                header.innerHTML = '';
-                header.appendChild(input);
-                input.focus();
-
-                input.addEventListener('blur', function() {
-                    saveColumns();
-                });
-
-                input.addEventListener('keydown', function (event) {
-                    if (event.key === 'Enter') {
-                        saveColumns();
-                    }
-                });
-            });
-        });
-    }
-
-    function saveColumns() {
-        const columns = Array.from(headerRow.querySelectorAll('.header-column')).map(header => {
-            // Retrieve the text content from the input field if it exists
-            if (header.querySelector('input')) {
-                return header.querySelector('input').value.trim() || 'Untitled';
-            } else {
-                return header.textContent.trim() || 'Untitled';
-            }
-        });
-
-        console.log('Columns to save:', columns); // Debugging line
-
-        fetch('/columns/save', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            },
-            body: JSON.stringify({
-                call_id: callId,
-                columns: columns
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            console.log('Response data:', data); // Debugging line
-            if (data.status === 'success') {
-                console.log('Columns saved successfully');
-                // Reload columns after saving
-                loadColumns();
-            } else {
-                console.error('Error saving columns:', data.message);
-            }
-        })
-        .catch(error => {
-            console.error('Error saving columns:', error);
-        });
-    }
-
-    loadColumns();
-});
+        var latitude = @json($latitude);
+        var longitude = @json($longitude);
     </script>
+    <script src="{{ asset('js/ic/command-map.js') }}"></script>
+    <script>
+        var callId = document.querySelector('.container').dataset.callId;
+    </script>
+    <script src="{{ asset('js/ic/command-columns.js') }}"></script> 
 @endpush
-
 @section('content')
 
     <div class="container" data-call-id="{{ $call_id }}">
