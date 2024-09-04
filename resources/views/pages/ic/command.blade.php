@@ -4,7 +4,6 @@
 
 @push('css')
     <link href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/4.5.6/css/ionicons-core.min.css" rel="stylesheet">
     <link href="https://api.mapbox.com/mapbox-gl-js/v3.6.0/mapbox-gl.css" rel="stylesheet">
     <link href="{{ asset('css/ic-command.css') }}" rel="stylesheet">
 @endpush
@@ -19,31 +18,110 @@
     <script src="{{ asset('js/ic/command-interaction.js') }}"></script>
     <script src="{{ asset('js/ic/command-updatedata.js') }}"></script>
     <script src="{{ asset('js/ic/command-assignments.js') }}"></script>
+    
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            mapboxgl.accessToken =
-                'pk.eyJ1IjoibGhheW5pZSIsImEiOiJjbGQzbG80b3cwams3M3BqcjJ1YjZjZTVhIn0.OhMTetZePiPzigNNL-yhyQ';
-            var latitude = @json($latitude);
-            var longitude = @json($longitude);
+document.addEventListener("DOMContentLoaded", function () {
+    const callId = document.querySelector('.container').dataset.callId;
+    const headerRow = document.querySelector('.header');
 
-            var map = new mapboxgl.Map({
-                container: 'map',
-                style: 'mapbox://styles/lhaynie/cleopgxcc000f01mq65j5rfiw',
-                center: [longitude, latitude],
-                zoom: 17
+    function loadColumns() {
+        fetch(`/columns/${callId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (Array.isArray(data)) { // Ensure the data is an array
+                    renderColumns(data);
+                    enableHeaderEditing();
+                } else {
+                    console.error('Unexpected data format:', data);
+                }
+            })
+            .catch(error => {
+                console.error('Error loading columns:', error);
             });
+    }
 
-            var el = document.createElement('div');
-            el.style.width = '30px';
-            el.style.height = '30px';
-            el.style.backgroundColor = 'red';
-            el.style.borderRadius = '50%';
-            el.style.border = '2px solid white';
+    function renderColumns(columns) {
+        // Clear existing columns
+        headerRow.innerHTML = '';
 
-            new mapboxgl.Marker(el)
-                .setLngLat([longitude, latitude])
-                .addTo(map);
+        columns.forEach(columnName => {
+            if (columnName) { // Check if columnName is not empty
+                const headerDiv = document.createElement('div');
+                headerDiv.className = 'header-column';
+                headerDiv.textContent = columnName;
+                headerRow.appendChild(headerDiv);
+            }
         });
+    }
+
+    function enableHeaderEditing() {
+        const headerColumns = headerRow.querySelectorAll('.header-column');
+        headerColumns.forEach(header => {
+            header.addEventListener('click', function () {
+                const currentText = header.textContent;
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.value = currentText;
+                input.style.width = `${header.offsetWidth}px`;
+
+                header.innerHTML = '';
+                header.appendChild(input);
+                input.focus();
+
+                input.addEventListener('blur', function() {
+                    saveColumns();
+                });
+
+                input.addEventListener('keydown', function (event) {
+                    if (event.key === 'Enter') {
+                        saveColumns();
+                    }
+                });
+            });
+        });
+    }
+
+    function saveColumns() {
+        const columns = Array.from(headerRow.querySelectorAll('.header-column')).map(header => {
+            // Retrieve the text content from the input field if it exists
+            if (header.querySelector('input')) {
+                return header.querySelector('input').value.trim() || 'Untitled';
+            } else {
+                return header.textContent.trim() || 'Untitled';
+            }
+        });
+
+        console.log('Columns to save:', columns); // Debugging line
+
+        fetch('/columns/save', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: JSON.stringify({
+                call_id: callId,
+                columns: columns
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Response data:', data); // Debugging line
+            if (data.status === 'success') {
+                console.log('Columns saved successfully');
+                // Reload columns after saving
+                loadColumns();
+            } else {
+                console.error('Error saving columns:', data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error saving columns:', error);
+        });
+    }
+
+    loadColumns();
+});
     </script>
 @endpush
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\ic;
 
 use App\Http\Controllers\Controller;
+use App\Models\AssignmentColumn;
 use App\Services\Spillman\ActiveCalls;
 use App\Services\Spillman\ActiveUnits;
 use App\Services\Spillman\Comments;
@@ -81,5 +82,51 @@ class Command extends Controller
             'comments' => $comments,
             'callnum' => $callnum,
         ]);
+    }
+
+    public function getColumns($call_id)
+    {
+        $columns = AssignmentColumn::where('call_id', $call_id)->first();
+        if (!$columns) {
+            // Create default columns if none exist
+            $defaultColumns = [
+                'Units', 'IC', 'FA', 'SEARCH', 'VENT', 'RIT', 'MED', 'DRONE', 'DIV A', 'DIV B'
+            ];
+            AssignmentColumn::create([
+                'call_id' => $call_id,
+                'columns' => $defaultColumns
+            ]);
+            return response()->json($defaultColumns);
+        }
+        return response()->json($columns->columns);
+    }
+
+    public function saveColumns(Request $request)
+    {
+        $request->validate([
+            'call_id' => 'required|string',
+            'columns' => 'required|array',
+        ]);
+    
+        try {
+            \Log::info('Saving columns:', [
+                'call_id' => $request->call_id,
+                'columns' => $request->columns
+            ]);
+    
+            $columns = $request->input('columns');
+    
+            $result = AssignmentColumn::updateOrCreate(
+                ['call_id' => $request->call_id],
+                ['columns' => $columns]
+            );
+    
+            \Log::info('Update or Create result:', $result->toArray());
+    
+            return response()->json(['status' => 'success']);
+        } catch (\Exception $e) {
+            \Log::error('Error saving columns:', ['message' => $e->getMessage()]);
+            return response()->json(['status' => 'error', 'message' => $e->getMessage()]);
+        }
     }
 }

@@ -11,3 +11,5 @@ Route::get('/', function () {
 
 Route::get('/ic/calls', [Calls::class, 'index'])->name('ic-calls');
 Route::get('/ic/{call_id}', [Command::class, 'index'])->name('ic-command');
+Route::get('/columns/{call_id}', [Command::class, 'getColumns']);
+Route::post('/columns/save', [Command::class, 'saveColumns']);

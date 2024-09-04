@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<meta name="csrf-token" content="{{ csrf_token() }}">
 <html lang="{{ app()->getLocale() }}" data-bs-theme="dark"> 
 <head>
 	@include('includes.head')
