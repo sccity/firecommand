@@ -4,6 +4,7 @@ namespace App\Http\Controllers\ic;
 
 use App\Http\Controllers\Controller;
 use App\Models\AssignmentColumn;
+use App\Models\UnitPosition;
 use App\Services\Spillman\ActiveCalls;
 use App\Services\Spillman\ActiveUnits;
 use App\Services\Spillman\Comments;
@@ -90,7 +91,16 @@ class Command extends Controller
         if (!$columns) {
             // Create default columns if none exist
             $defaultColumns = [
-                'Units', 'IC', 'FA', 'SEARCH', 'VENT', 'RIT', 'MED', 'DRONE', 'DIV A', 'DIV B'
+                'Units',
+                'IC',
+                'FA',
+                'SEARCH',
+                'VENT',
+                'RIT',
+                'MED',
+                'DRONE',
+                'DIV A',
+                'DIV B'
             ];
             AssignmentColumn::create([
                 'call_id' => $call_id,
@@ -107,25 +117,55 @@ class Command extends Controller
             'call_id' => 'required|string',
             'columns' => 'required|array',
         ]);
-    
+
         try {
             \Log::info('Saving columns:', [
                 'call_id' => $request->call_id,
                 'columns' => $request->columns
             ]);
-    
+
             $columns = $request->input('columns');
-    
+
             $result = AssignmentColumn::updateOrCreate(
                 ['call_id' => $request->call_id],
                 ['columns' => $columns]
             );
-    
+
             \Log::info('Update or Create result:', $result->toArray());
-    
+
             return response()->json(['status' => 'success']);
         } catch (\Exception $e) {
             \Log::error('Error saving columns:', ['message' => $e->getMessage()]);
+            return response()->json(['status' => 'error', 'message' => $e->getMessage()]);
+        }
+    }
+
+    // New method to save unit positions and timestamps
+    public function saveUnitPosition(Request $request)
+    {
+        $request->validate([
+            'unit' => 'required|string',
+            'column' => 'required|string',
+            'timestamp' => 'required|date',
+            'call_id' => 'required|string',
+        ]);
+    
+        try {
+            \Log::info('Saving unit position:', [
+                'unit' => $request->unit,
+                'column' => $request->column,
+                'timestamp' => $request->timestamp,
+                'call_id' => $request->call_id
+            ]);
+    
+            UnitPosition::updateOrCreate(
+                ['unit_name' => $request->unit, 'call_id' => $request->call_id],
+                ['column_name' => $request->column, 'last_moved_at' => $request->timestamp]
+            );
+    
+            return response()->json(['status' => 'success']);
+        } catch (\Exception $e) {
+            \Log::error('Error saving unit position:', ['message' => $e->getMessage()]);
             return response()->json(['status' => 'error', 'message' => $e->getMessage()]);
         }
     }

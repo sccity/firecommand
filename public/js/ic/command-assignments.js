@@ -2,6 +2,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const assignmentsColumns = document.getElementById('assignments-columns');
     const incidentTypeDropdown = document.getElementById('incident-type-dropdown');
     const headerRow = document.querySelector('.header');
+    const callId = document.querySelector('meta[name="call-id"]').getAttribute('content'); // Get the call ID
 
     const columnsConfig = {
         "Structure Fire": ["IC", "FA", "SEARCH", "VENT", "RIT", "MED", "DRONE", "DIV A", "DIV B"],
@@ -36,6 +37,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
         enableHeaderEditing();
+        saveColumns(); // Save columns whenever they are updated
     }
 
     function enableHeaderEditing() {
@@ -67,7 +69,36 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    updateAssignmentColumns("Structure Fire");
+    function saveColumns() {
+        const columns = Array.from(headerRow.querySelectorAll('.header-column')).map(header => {
+            return header.textContent.trim().slice(0, 8) || ''; // Ensure saved value is limited to 8 characters
+        });
+
+        fetch('/columns/save', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: JSON.stringify({
+                call_id: callId,
+                columns: columns
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                console.log('Columns saved successfully');
+            } else {
+                console.error('Error saving columns:', data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error saving columns:', error);
+        });
+    }
+
+    // Initialize columns based on default incident type
 
     incidentTypeDropdown.addEventListener('change', function () {
         const selectedIncidentType = this.value;
