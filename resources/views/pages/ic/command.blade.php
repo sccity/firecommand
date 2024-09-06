@@ -15,8 +15,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js"></script>
     <script src="https://api.mapbox.com/mapbox-gl-js/v3.6.0/mapbox-gl.js"></script>
     <script src="{{ asset('js/ic/command-par.js') }}"></script>
-    <script src="{{ asset('js/ic/command-interaction.js') }}"></script>
-    <script src="{{ asset('js/ic/command-updatedata.js') }}"></script>
     <script src="{{ asset('js/ic/command-assignments.js') }}"></script>
     <script>
         var latitude = @json($latitude);
@@ -26,7 +24,6 @@
     <script>
         var callId = document.querySelector('.container').dataset.callId;
     </script>
-    <script src="{{ asset('js/ic/command-columns.js') }}"></script> 
 @endpush
 @section('content')
 
@@ -78,16 +75,16 @@
             <div class="panel-body bg-gray-800 text-white">
                 <!-- Header -->
                 <div class="header">
-                    <div class="header-column">Units</div>
-                    <div class="header-column">IC</div>
-                    <div class="header-column">FA</div>
-                    <div class="header-column">SEARCH</div>
-                    <div class="header-column">VENT</div>
-                    <div class="header-column">RIT</div>
-                    <div class="header-column">MED</div>
-                    <div class="header-column">DRONE</div>
-                    <div class="header-column">DIV A</div>
-                    <div class="header-column">DIV B</div>
+                    <div class="header-column"></div>
+                    <div class="header-column"></div>
+                    <div class="header-column"></div>
+                    <div class="header-column"></div>
+                    <div class="header-column"></div>
+                    <div class="header-column"></div>
+                    <div class="header-column"></div>
+                    <div class="header-column"></div>
+                    <div class="header-column"></div>
+                    <div class="header-column"></div>
                 </div>
 
                 <!-- Columns (Units + Assignments) -->

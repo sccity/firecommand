@@ -4,7 +4,6 @@ namespace App\Http\Controllers\ic;
 
 use App\Http\Controllers\Controller;
 use App\Models\AssignmentColumn;
-use App\Models\UnitPosition;
 use App\Services\Spillman\ActiveCalls;
 use App\Services\Spillman\ActiveUnits;
 use App\Services\Spillman\Comments;
@@ -26,7 +25,7 @@ class Command extends Controller
     public function index(Request $request, $call_id = null)
     {
         if (empty($call_id)) {
-            return redirect()->route('fc-calls');
+            return redirect()->route('/');
         }
 
         $unitData = $this->activeUnitsService->getActiveUnits($call_id);
@@ -140,33 +139,5 @@ class Command extends Controller
         }
     }
 
-    // New method to save unit positions and timestamps
-    public function saveUnitPosition(Request $request)
-    {
-        $request->validate([
-            'unit' => 'required|string',
-            'column' => 'required|string',
-            'timestamp' => 'required|date',
-            'call_id' => 'required|string',
-        ]);
-    
-        try {
-            \Log::info('Saving unit position:', [
-                'unit' => $request->unit,
-                'column' => $request->column,
-                'timestamp' => $request->timestamp,
-                'call_id' => $request->call_id
-            ]);
-    
-            UnitPosition::updateOrCreate(
-                ['unit_name' => $request->unit, 'call_id' => $request->call_id],
-                ['column_name' => $request->column, 'last_moved_at' => $request->timestamp]
-            );
-    
-            return response()->json(['status' => 'success']);
-        } catch (\Exception $e) {
-            \Log::error('Error saving unit position:', ['message' => $e->getMessage()]);
-            return response()->json(['status' => 'error', 'message' => $e->getMessage()]);
-        }
-    }
+   
 }
