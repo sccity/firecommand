@@ -66,34 +66,6 @@ $(function() {
         }
     }
 
-    $(".box").draggable({
-        revert: "invalid",
-        helper: "original",
-        start: function(event, ui) {
-            $(this).data('originalContainer', $(this).parent());
-        }
-    });
-
-    $(".column").droppable({
-        accept: ".box",
-        drop: function(event, ui) {
-            var droppedBox = $(ui.draggable);
-            var targetContainer = $(this);
-            droppedBox.appendTo(targetContainer).css({
-                top: 'auto',
-                left: 'auto',
-                position: 'relative'
-            });
-
-            if (!targetContainer.hasClass('available-units') && !targetContainer.hasClass('ic-column')) {
-                droppedBox.find('.dot').remove();
-                droppedBox.append('<div class="green-dot dot"></div>');
-            } else {
-                droppedBox.find('.dot').remove();
-            }
-        }
-    });
-
     $(document).on('click', '.box', resetDot);
 
     startTimer($('#timer'));
@@ -101,4 +73,6 @@ $(function() {
     $('#reset-timer').on('click', function() {
         resetTimer();
     });
+
+    // Removed draggable and droppable functionality to avoid conflict with command-assignments.js
 });

@@ -1,3 +1,4 @@
+<!--command.blade.php -->
 @extends('layouts.default')
 
 @section('title', 'IC')
@@ -9,12 +10,13 @@
 @endpush
 
 @push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/interactjs@latest/dist/interact.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/interact.js/1.0.2/interact.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js"></script>
     <script src="https://api.mapbox.com/mapbox-gl-js/v3.6.0/mapbox-gl.js"></script>
-    <script src="{{ asset('js/ic/command-par.js') }}"></script>
+    <script src="{{ asset('js/ic/command-par1.js') }}"></script>
     <script src="{{ asset('js/ic/command-assignments.js') }}"></script>
     <script>
         var latitude = @json($latitude);
@@ -59,7 +61,7 @@
                                 <option value="Other Fire">Other Fire</option>
                                 <option value="Medical">Medical</option>
                                 <option value="MCI">MCI</option>
-                                <option value="Other">Other</option>
+                                <option value="Custom">Custom</option>
                             </select>
                         </div>
                     </div>
@@ -73,20 +75,10 @@
                 <h4 class="panel-title">Unit Assignments</h4>
             </div>
             <div class="panel-body bg-gray-800 text-white">
-                <!-- Header -->
-                <div class="header">
-                    <div class="header-column"></div>
-                    <div class="header-column"></div>
-                    <div class="header-column"></div>
-                    <div class="header-column"></div>
-                    <div class="header-column"></div>
-                    <div class="header-column"></div>
-                    <div class="header-column"></div>
-                    <div class="header-column"></div>
-                    <div class="header-column"></div>
-                    <div class="header-column"></div>
+                <div class="header" id="header-row">
+                    <!-- Header columns will be dynamically added here -->
                 </div>
-
+                
                 <!-- Columns (Units + Assignments) -->
                 <div class="assignments-columns" id="assignments-columns">
                     <!-- Units Column -->

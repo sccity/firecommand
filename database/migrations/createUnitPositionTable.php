@@ -6,27 +6,21 @@ use Illuminate\Support\Facades\Schema;
 
 class CreateUnitPositionsTable extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
     public function up()
     {
         Schema::create('unit_positions', function (Blueprint $table) {
             $table->id();
-            $table->string('unit_name');
-            $table->string('column_name');
-            $table->timestamp('last_moved_at');
+            $table->unsignedBigInteger('unit_id');
+            $table->unsignedBigInteger('column_id');
+            $table->timestamp('last_moved_at')->nullable();
+            $table->unsignedBigInteger('call_id');
             $table->timestamps();
+
+            $table->foreign('unit_id')->references('id')->on('units')->onDelete('cascade');
+            $table->foreign('column_id')->references('id')->on('assignment_columns')->onDelete('cascade');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
     public function down()
     {
         Schema::dropIfExists('unit_positions');

@@ -2,26 +2,53 @@ document.addEventListener("DOMContentLoaded", function () {
     const headerRow = document.querySelector('.header');
     const assignmentsColumns = document.getElementById('assignments-columns');
     const incidentTypeDropdown = document.getElementById('incident-type-dropdown');
-    const callId = document.querySelector('meta[name="call-id"]').getAttribute('content'); // Get the call ID
+    const callId = document.querySelector('.container').dataset.callId;
     let debounceTimer = null;
+    let timerInterval;
+    let totalSeconds = 0;
+    let flashInterval;
+    let isFlashing = false;
+    const timeoutDuration = 10 * 60 * 1000; // 10 minutes in milliseconds
+    const timerDisplay = document.getElementById('timer');
 
     const columnsConfig = {
-        "Structure Fire": ["IC", "FA", "SEARCH", "VENT", "RIT", "MED", "DRONE", "DIV A", "DIV B"],
-        "Brush Fire": ["IC", "IA", "DIV A", "DIV B", "DIV C", "DIV D", "DRONE", "STAGE", "MED"],
-        "Other Fire": ["IC", "FA", "DIV A", "DIV B", "DIV C", "DIV D", "DRONE", "STAGE", "MED"],
-        "Medical": ["IC", "MED", "STAGE", "ALT 1", "ALT 2", "ALT 3", "ALT 4", "DIV A", "DIV B"],
-        "MCI": ["IC", "MED A", "MED B", "MED C", "MED D", "DIV A", "DIV B", "DIV C", "DIV D"],
-        "Other": ["IC", "OTH 1", "OTH 2", "OTH 3", "OTH 4", "OTH 5", "OTH 6", "OTH 7", "OTH 8"]
+        "Structure Fire": ["Units", "IC", "FA", "SEARCH", "VENT", "RIT", "MED", "DRONE", "DIV A", "DIV B"],
+        "Brush Fire": ["Units", "IC", "IA", "DIV A", "DIV B", "DIV C", "DIV D", "DRONE", "STAGE", "MED"],
+        "Other Fire": ["Units", "IC", "FA", "DIV A", "DIV B", "DIV C", "DIV D", "DRONE", "STAGE", "MED"],
+        "Medical": ["Units", "IC", "MED", "STAGE", "ALT 1", "ALT 2", "ALT 3", "ALT 4", "DIV A", "DIV B"],
+        "MCI": ["Units", "IC", "MED A", "MED B", "MED C", "MED D", "DIV A", "DIV B", "DIV C", "DIV D"],
+        "Other": ["Units", "IC", "OTH 1", "OTH 2", "OTH 3", "OTH 4", "OTH 5", "OTH 6", "OTH 7", "OTH 8"]
     };
 
-    // Load columns from server
     function loadColumns() {
         fetch(`/columns/${callId}`)
             .then(response => response.json())
             .then(data => {
-                if (Array.isArray(data)) { // Ensure the data is an array
+                if (Array.isArray(data)) {
+                    let fixedColumns = ["Units", "IC"];
+                    let otherColumns = data.filter(col => !fixedColumns.includes(col));
+                    data = [...fixedColumns, ...otherColumns];
+    
                     renderColumns(data);
                     enableHeaderEditing();
+    
+                    let isCustom = true;
+                    for (const [incidentType, columns] of Object.entries(columnsConfig)) {
+                        const normalizedData = [...new Set(data)];
+                        const normalizedConfig = [...new Set(columns)];
+                        
+                        if (JSON.stringify(normalizedData) === JSON.stringify(normalizedConfig)) {
+                            incidentTypeDropdown.value = incidentType;
+                            isCustom = false;
+                            break;
+                        }
+                    }
+    
+                    if (isCustom) {
+                        incidentTypeDropdown.value = "Custom";
+                    }
+    
+                    renderAssignmentColumns(data);
                 } else {
                     console.error('Unexpected data format:', data);
                 }
@@ -32,31 +59,35 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function renderColumns(columns) {
-        // Clear existing columns
+        console.log(`Rendering columns: ${columns}`);
         headerRow.innerHTML = '';
-
-        const fragment = document.createDocumentFragment(); // Use a fragment for better performance
-        columns.forEach(columnName => {
-            if (columnName) { // Check if columnName is not empty
+    
+        const fragment = document.createDocumentFragment();
+        columns.forEach((columnName) => {
+            if (columnName) {
                 const headerDiv = document.createElement('div');
                 headerDiv.className = 'header-column';
                 headerDiv.textContent = columnName;
                 fragment.appendChild(headerDiv);
             }
         });
-        headerRow.appendChild(fragment); // Append the fragment in a single operation
+        headerRow.appendChild(fragment);
+    
+        initializeDragAndDrop();
     }
 
     function enableHeaderEditing() {
         const headerColumns = headerRow.querySelectorAll('.header-column');
         headerColumns.forEach(header => {
             header.addEventListener('click', function () {
+                if (header.textContent === "Units" || header.textContent === "IC") return;
+
                 const currentText = header.textContent;
                 const input = document.createElement('input');
                 input.type = 'text';
                 input.value = currentText;
                 input.style.width = `${header.offsetWidth}px`;
-                input.maxLength = 8; // Limit input length to 8 characters
+                input.maxLength = 8;
 
                 header.innerHTML = '';
                 header.appendChild(input);
@@ -79,18 +110,20 @@ document.addEventListener("DOMContentLoaded", function () {
         clearTimeout(debounceTimer);
 
         const oldValue = header.textContent;
-        header.textContent = newValue.trim().slice(0, 8) || oldValue; // Limit display to 8 characters
+        header.textContent = newValue.trim().slice(0, 8) || oldValue;
 
         debounceTimer = setTimeout(() => {
             saveColumns();
-        }, 300); // Delay save by 300ms
+        }, 300);
     }
 
     function saveColumns() {
         const columns = Array.from(headerRow.querySelectorAll('.header-column')).map(header => {
-            return header.textContent.trim().slice(0, 8) || ''; // Ensure saved value is limited to 8 characters
+            return header.textContent.trim().slice(0, 8) || '';
         });
 
+        const uniqueColumns = ["Units", "IC", ...new Set(columns.filter(col => col !== "Units" && col !== "IC"))];
+        
         fetch('/columns/save', {
             method: 'POST',
             headers: {
@@ -99,7 +132,7 @@ document.addEventListener("DOMContentLoaded", function () {
             },
             body: JSON.stringify({
                 call_id: callId,
-                columns: columns
+                columns: uniqueColumns
             })
         })
         .then(response => response.json())
@@ -115,80 +148,131 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // Function to update columns based on incident type
-    function updateAssignmentColumns(incidentType) {
-        const existingColumns = document.querySelectorAll('.assignment, .ic-column');
-        existingColumns.forEach(column => column.remove());
-
-        while (headerRow.children.length > 1) {
-            headerRow.removeChild(headerRow.lastChild);
-        }
-
-        const selectedColumns = columnsConfig[incidentType];
-
-        selectedColumns.forEach(column => {
-            const headerDiv = document.createElement('div');
-            headerDiv.className = 'header-column';
-            headerDiv.textContent = column;
-            headerRow.appendChild(headerDiv);
-
-            const columnDiv = document.createElement('div');
-            columnDiv.className = column === "IC" ? "column ic-column" : "column assignment";
-            columnDiv.id = column.toLowerCase().replace(/ /g, '_');
-            columnDiv.innerHTML = `<div class="flex-grow"></div>`;
-            assignmentsColumns.appendChild(columnDiv);
-        });
-
-        enableHeaderEditing();
-        saveColumns(); // Save columns whenever they are updated
-    }
-
-    // Initialize draggable functionality for boxes
-    $(function () {
-        var isDragging = false;
-    
-        interact('.box').draggable({
-            inertia: true,
-            autoScroll: true,
-            listeners: {
-                start(event) {
-                    isDragging = true;
-                },
-                move(event) {
-                    const target = event.target;
-                    const x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
-                    const y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
-    
-                    target.style.transform = `translate(${x}px, ${y}px)`;
-                    target.setAttribute('data-x', x);
-                    target.setAttribute('data-y', y);
-                },
-                end(event) {
-                    isDragging = false;
-                }
+    function renderAssignmentColumns(columns) {
+        console.log(`Rendering assignment columns: ${columns}`);
+        const currentColumns = Array.from(assignmentsColumns.children);
+        
+        currentColumns.forEach(col => {
+            if (!col.classList.contains('available-units')) {
+                col.remove();
             }
         });
+        
+        const fragment = document.createDocumentFragment();
+        columns.forEach(column => {
+            if (column && column !== "Units" && column !== "IC") {
+                const columnDiv = document.createElement('div');
+                columnDiv.className = "column assignment";
+                columnDiv.id = column.toLowerCase().replace(/ /g, '_');
+                columnDiv.innerHTML = `<div class="flex-grow"></div>`;
+                fragment.appendChild(columnDiv);
+            }
+        });
+        assignmentsColumns.appendChild(fragment);
+    
+        setTimeout(() => {
+            initializeDragAndDrop();
+        }, 0);
+    }
 
-        // Initialize drop zones
-        interact('.column').dropzone({
-            accept: '.box',
-            overlap: 0.5,
-            ondrop(event) {
-                const droppedBox = $(event.relatedTarget);
-                const targetContainer = $(event.target);
+    function updateAssignmentColumns(incidentType) {
+        console.log(`Updating columns for incident type: ${incidentType}`);
+        if (incidentType === "Custom") {
+            return;
+        }
 
-                const unitName = droppedBox.data('unitName');
-                const columnName = targetContainer.find('.header-column').text().trim();
-                const timestamp = new Date().toISOString();
+        const selectedColumns = columnsConfig[incidentType] || [];
+        const allColumns = ["Units", "IC", ...selectedColumns];
 
+        console.log(`Selected columns: ${selectedColumns}`);
+        console.log(`All columns: ${allColumns}`);
+        
+        const existingColumns = Array.from(headerRow.querySelectorAll('.header-column')).map(header => header.textContent.trim());
+        const uniqueColumns = [...new Set(allColumns)];
+        if (existingColumns.join(',') !== uniqueColumns.join(',')) {
+            renderColumns(uniqueColumns);
+            renderAssignmentColumns(uniqueColumns);
+            saveColumns();
+        }
+    }
+
+    function sendUnitPositionUpdate(unitId, columnId) {
+        fetch('/unit-positions/update', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: JSON.stringify({
+                unit_id: unitId,
+                column_id: columnId,
+                call_id: document.querySelector('.container').dataset.callId
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                console.log('Unit position updated successfully');
+            } else {
+                console.error('Error updating unit position:', data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error updating unit position:', error);
+        });
+    }
+    function initializeUnitPositions() {
+        fetch('/unit-positions/initialize', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: JSON.stringify({
+                call_id: document.querySelector('.container').dataset.callId
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                console.log('Unit positions initialized');
+            } else {
+                console.error('Error initializing unit positions:', data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error initializing unit positions:', error);
+        });
+    }
+
+    
+    function initializeDragAndDrop() {
+        console.log('Initializing drag and drop');
+    
+        $(".box").draggable({
+            revert: "invalid",
+            helper: "original",
+            start: function(event, ui) {
+                $(this).data('originalContainer', $(this).parent());
+            }
+        });
+    
+        $(".column").droppable({
+            accept: ".box",
+            drop: function(event, ui) {
+                var droppedBox = $(ui.draggable);
+                var targetContainer = $(this);
                 droppedBox.appendTo(targetContainer).css({
                     top: 'auto',
                     left: 'auto',
-                    transform: 'none'
+                    position: 'relative'
                 });
-
-                droppedBox.attr('data-x', 0).attr('data-y', 0);
-
+    
+                var unitId = droppedBox.data('unitId'); // Ensure this is set somewhere in your code
+                var columnId = targetContainer.data('columnId'); // Ensure this is set somewhere in your code
+    
+                sendUnitPositionUpdate(unitId, columnId);
+    
                 if (!targetContainer.hasClass('available-units') && !targetContainer.hasClass('ic-column')) {
                     droppedBox.find('.dot').remove();
                     droppedBox.append('<div class="green-dot dot"></div>');
@@ -197,32 +281,117 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             }
         });
-    
-        $(document).on('click', '.box', function () {
-            if (!isDragging) {
-                var dot = $(this).find('.dot');
-                if (dot.hasClass('red-dot')) {
-                    dot.removeClass('red-dot').addClass('green-dot');
-                }
-                $(this).data('manuallyReset', true);
+    }
 
-                if ($('.assignment .box').length === $('.assignment .box .green-dot').length) {
-                    resetTimer();
-                }
+    function startBoxTimer(box) {
+        box.dataset.startTime = Date.now();
+        setInterval(() => {
+            const elapsed = Date.now() - box.dataset.startTime;
+            if (elapsed >= timeoutDuration) {
+                turnBoxRed(box);
+                startFlashingTimer();
             }
-        });
+        }, 1000);
+    }
 
-        function resetTimer() {
-            // Implement timer reset logic here
+    function resetBoxTimer(box) {
+        if (box.dataset.startTime) {
+            box.dataset.startTime = Date.now();
+            turnBoxGreen(box);
+            stopFlashingTimer();
+        } else {
+            startBoxTimer(box);
         }
+    }
+
+    function turnBoxRed(box) {
+        const greenDot = box.querySelector('.green-dot');
+        if (greenDot) {
+            greenDot.classList.replace('green-dot', 'red-dot');
+            checkForRedLights();
+        }
+    }
+
+    function turnBoxGreen(box) {
+        const redDot = box.querySelector('.red-dot');
+        if (redDot) {
+            redDot.classList.replace('red-dot', 'green-dot');
+        }
+        if (document.querySelectorAll('.red-dot').length === 0) {
+            stopFlashingTimer();
+        }
+    }
+
+    function checkForRedLights() {
+        if (document.querySelectorAll('.red-dot').length > 0) {
+            startFlashingTimer();
+        }
+    }
+
+    function startTimer(display) {
+        timerInterval = setInterval(() => {
+            totalSeconds++;
+            const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
+            const minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
+            const seconds = String(totalSeconds % 60).padStart(2, '0');
+
+            display.textContent = `${hours}:${minutes}:${seconds}`;
+
+            if (totalSeconds >= timeoutDuration / 1000) {
+                document.querySelectorAll('.assignment .box').forEach(function(box) {
+                    if (!box.querySelector('.red-dot')) {
+                        turnBoxRed(box);
+                    }
+                });
+            }
+        }, 1000);
+    }
+
+    function startFlashingTimer() {
+        if (isFlashing) return;
+        isFlashing = true;
+        flashInterval = setInterval(() => {
+            timerDisplay.classList.toggle('timer-flash');
+        }, 500);
+    }
+
+    function stopFlashingTimer() {
+        clearInterval(flashInterval);
+        isFlashing = false;
+        timerDisplay.classList.remove('timer-flash');
+    }
+
+    function resetTimer() {
+        clearInterval(timerInterval);
+        totalSeconds = 0;
+        timerDisplay.textContent = "00:00:00";
+        startTimer(timerDisplay);
+
+        document.querySelectorAll('.assignment .box .red-dot').forEach(function(dot) {
+            dot.classList.remove('red-dot');
+            dot.classList.add('green-dot');
+        });
+        stopFlashingTimer();
+    }
+
+    function resetDot() {
+        const box = this;
+        turnBoxGreen(box);
+        if (document.querySelectorAll('.assignment .box .red-dot').length === 0) {
+            resetTimer();
+        }
+    }
+
+    document.querySelectorAll(".box").forEach(box => {
+        box.addEventListener('click', resetDot);
     });
 
-    // Initialize columns based on default incident type
+    document.getElementById('reset-timer').addEventListener('click', resetTimer);
+
     incidentTypeDropdown.addEventListener('change', function () {
-        const selectedIncidentType = this.value;
-        updateAssignmentColumns(selectedIncidentType);
+        updateAssignmentColumns(this.value);
     });
 
-    // Initial load of columns
     loadColumns();
+    startTimer(timerDisplay);
 });
