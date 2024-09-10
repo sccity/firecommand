@@ -1,5 +1,5 @@
 <?php
-
+//command.php
 namespace App\Http\Controllers\ic;
 
 use App\Http\Controllers\Controller;
@@ -48,6 +48,8 @@ class Command extends Controller
         $latitude = $callDetails['latitude'] ?? '0.0';
         $longitude = $callDetails['longitude'] ?? '0.0';
         $callnum = $callDetails['callnum'] ?? 'UNK';
+        $agency = $callDetails['agency'] ?? 'Unknown';  // Default value for agency
+        $calltype = $callDetails['calltype'] ?? 'Unknown';  // Default value for call type
 
         $units = $unitData['units'] ?? [];
         if (empty($units)) {
@@ -81,6 +83,8 @@ class Command extends Controller
             'longitude' => (float) $longitude,
             'comments' => $comments,
             'callnum' => $callnum,
+            'agency' => $agency,
+            'calltype' => $calltype,
         ]);
     }
 
@@ -138,7 +142,4 @@ class Command extends Controller
             return response()->json(['status' => 'error', 'message' => $e->getMessage()]);
         }
     }
-
-    // New method to save unit positions and timestamps
-   
 }

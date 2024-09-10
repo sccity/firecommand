@@ -1,5 +1,5 @@
 <?php
-
+#web.php
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ic\Calls;
 use App\Http\Controllers\ic\Command;

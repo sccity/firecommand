@@ -1,4 +1,4 @@
-<!--command.blade.php -->
+<!-- command.blade.php -->
 @extends('layouts.default')
 
 @section('title', 'IC')
@@ -10,7 +10,7 @@
 @endpush
 
 @push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/interactjs@latest/dist/interact.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/interactjs@latest/dist/interact.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/interact.js/1.0.2/interact.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
@@ -27,48 +27,35 @@
         var callId = document.querySelector('.container').dataset.callId;
     </script>
 @endpush
+
 @section('content')
-
     <div class="container" data-call-id="{{ $call_id }}">
+        <div class="header-info">
+            <h1>{{ $callnum }} {{ $nature }}</h1>
+            <p>{{ $address }} - {{ $city }}/{{ $zone }}</p>
+        </div>
 
-            <div class="panel-body bg-gray-800 text-white">
-                <h1 style="text-transform: uppercase;">{{ $callnum }} {{ $nature }} - {{ $address }} -
-                    {{ $city }}/{{ $zone }}</h1>
-                <!-- BEGIN row -->
-                <div class="row" style="margin-left: 0; margin-right: 0;">
-                    <!-- BEGIN col-9 for the map -->
-                    <div id="map" class="col-xl-9 col-md-12" style="height: 250px;"></div>
-                    <!-- END col-9 -->
-
-                    <!-- BEGIN col-3 for the timer -->
-                    <div class="col-xl-3 col-md-6">
-                        <div class="widget widget-stats bg-red">
-                            <div class="stats-icon"></div>
-                            <div class="stats-info" style="text-align: center;">
-                                <p id="timer" style="font-size: 40px; font-weight: bold;">00:00:00</p>
-                            </div>
-                            <div class="stats-link" style="text-align: center;">
-                                <a href="javascript:;" id="reset-timer">
-                                    <center>Reset PAR</center>
-                                </a>
-                            </div>
-                        </div>
-                        <div class="form-group mt-3" style="text-align: center;">
-                            <label for="incident-type-dropdown">Incident Type</label>
-                            <select class="form-control" id="incident-type-dropdown">
-                                <option value="Structure Fire">Structure Fire</option>
-                                <option value="Brush Fire">Brush Fire</option>
-                                <option value="Other Fire">Other Fire</option>
-                                <option value="Medical">Medical</option>
-                                <option value="MCI">MCI</option>
-                                <option value="Custom">Custom</option>
-                            </select>
-                        </div>
-                    </div>
-                    <!-- END col-3 -->
+        <div class="map-container">
+            <div id="map"></div>
+            <div class="par-area">
+                <div class="timer-display" id="timer">00:00:00</div>
+                <div class="reset-par">
+                    <a href="javascript:;" id="reset-timer">Reset PAR</a>
                 </div>
-                <!-- END row -->
+                <div class="form-group mt-3" style="text-align: center;">
+                    <label for="incident-type-dropdown">Incident Type</label>
+                    <select class="form-control" id="incident-type-dropdown">
+                        <option value="Structure Fire">Structure Fire</option>
+                        <option value="Brush Fire">Brush Fire</option>
+                        <option value="Other Fire">Other Fire</option>
+                        <option value="Medical">Medical</option>
+                        <option value="MCI">MCI</option>
+                        <option value="Custom">Custom</option>
+                    </select>
+                </div>
             </div>
+        </div>
+
         <!-- BEGIN panel -->
         <div class="panel panel-inverse" data-sortable-id="ui-widget-18">
             <div class="panel-heading">
@@ -102,24 +89,23 @@
             </div>
         </div>
         <!-- END panel -->
-        <!-- BEGIN panel -->
-        <div class="panel panel-inverse" data-sortable-id="ui-widget-18">
+
+        <!-- BEGIN comments panel -->
+        <div class="panel panel-inverse comments-panel" data-sortable-id="ui-widget-18">
             <div class="panel-heading">
                 <h4 class="panel-title">CAD Comments</h4>
                 <div class="panel-heading-btn">
-                    <a href="javascript:;" class="btn btn-xs btn-icon btn-default" data-toggle="panel-expand"><i
-                            class="fa fa-expand"></i></a>
-                    <a href="javascript:;" class="btn btn-xs btn-icon btn-warning" data-toggle="panel-collapse"><i
-                            class="fa fa-minus"></i></a>
+                    <a href="javascript:;" class="btn btn-xs btn-icon btn-default" data-toggle="panel-expand"><i class="fa fa-expand"></i></a>
+                    <a href="javascript:;" class="btn btn-xs btn-icon btn-warning" data-toggle="panel-collapse"><i class="fa fa-minus"></i></a>
                 </div>
             </div>
             <div class="panel-body bg-gray-800 text-white">
-                <h4>{!! str_replace(['{', '}'], '', $comments) !!}</h4>
+                <div class="comments-content">{!! str_replace(['{', '}'], '', $comments) !!}</div>
             </div>
             <div class="hljs-wrapper">
                 <pre><code class="html" data-url="/assets/data/ui-widget-boxes/code-18.json"></code></pre>
             </div>
         </div>
-        <!-- END panel -->
+        <!-- END comments panel -->
     </div>
 @endsection
