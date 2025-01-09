@@ -74,6 +74,18 @@
             </div>
         </div>
 
+        <!-- Incident Timer -->
+        <div id="incidentTimer" class="hidden mb-6 text-center">
+            <div class="inline-flex items-center space-x-2 text-4xl font-bold text-gray-700">
+                <span id="timerHours">00</span>
+                <span>:</span>
+                <span id="timerMinutes">00</span>
+                <span>:</span>
+                <span id="timerSeconds">00</span>
+            </div>
+            <div class="text-sm text-gray-500 mt-1">Incident Duration</div>
+        </div>
+
         <!-- Unit Assignment Container -->
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <div class="grid grid-cols-5 gap-6">
@@ -143,20 +155,76 @@
         </div>
 
         <script>
+            let timerInterval;
+            let startTime;
+
+            function formatNumber(number) {
+                return number.toString().padStart(2, '0');
+            }
+
+            function updateTimer() {
+                const now = new Date();
+                const diff = now - startTime;
+                const hours = Math.floor(diff / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+                document.getElementById('timerHours').textContent = formatNumber(hours);
+                document.getElementById('timerMinutes').textContent = formatNumber(minutes);
+                document.getElementById('timerSeconds').textContent = formatNumber(seconds);
+            }
+
+            function startTimer() {
+                if (!timerInterval) {
+                    const timerElement = document.getElementById('incidentTimer');
+                    timerElement.classList.remove('hidden');
+                    startTime = new Date();
+                    timerInterval = setInterval(updateTimer, 1000);
+                }
+            }
+
             function handleDragStart(event) {
-                event.dataTransfer.setData('text/plain', event.target.innerHTML);
+                event.dataTransfer.setData('text/plain', event.target.innerHTML.trim());
+                event.dataTransfer.setData('sourceId', event.target.id || 'available');
                 event.target.classList.add('opacity-50');
             }
 
             function handleDrop(event, container) {
                 event.preventDefault();
                 const data = event.dataTransfer.getData('text/plain');
+                const sourceId = event.dataTransfer.getData('sourceId');
+                
+                // Find the source element
+                let sourceElement;
+                if (sourceId === 'available') {
+                    // Find the element in the available units container by text content
+                    const availableUnits = document.querySelectorAll('[draggable=true]');
+                    sourceElement = Array.from(availableUnits).find(el => el.textContent.trim() === data);
+                } else {
+                    sourceElement = document.getElementById(sourceId);
+                }
+
+                // Remove the unit from its previous location
+                if (sourceElement) {
+                    sourceElement.remove();
+                }
+
+                // Create new element in the target container
                 const draggedElement = document.createElement('div');
                 draggedElement.className = 'bg-white p-3 rounded shadow-sm border border-gray-200 cursor-move hover:shadow-md transition-shadow';
                 draggedElement.draggable = true;
                 draggedElement.ondragstart = function(e) { handleDragStart(e) };
                 draggedElement.innerHTML = data;
+                draggedElement.id = `unit-${Date.now()}`; // Unique ID for tracking
+
+                // Add to the new container
                 container.appendChild(draggedElement);
+
+                // Check if this is the IC position and start timer if needed
+                const isICPosition = container.querySelector('h3')?.textContent.includes('Incident Commander');
+                if (isICPosition) {
+                    startTimer();
+                }
             }
 
             function editLabel(button) {
