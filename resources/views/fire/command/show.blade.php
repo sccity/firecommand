@@ -561,23 +561,94 @@
                 });
             });
 
-            // Template definitions
+            // Template definitions with container counts
             const templates = {
-                default: (index) => index === 1 ? 'Incident Commander' : `Assignment ${index - 1}`,
-                template1: (index) => index === 1 ? 'Incident Commander' : `A-${index - 1} Assignment`,
-                template2: (index) => index === 1 ? 'Incident Commander' : `B-${index - 1} Assignment`
+                default: {
+                    count: 9,
+                    getName: (index) => index === 1 ? 'Incident Commander' : `Assignment ${index - 1}`
+                },
+                template1: {
+                    count: 6,
+                    getName: (index) => index === 1 ? 'Incident Commander' : `A-${index - 1} Assignment`
+                },
+                template2: {
+                    count: 12,
+                    getName: (index) => index === 1 ? 'Incident Commander' : `B-${index - 1} Assignment`
+                }
             };
+
+            // Function to create assignment container
+            function createAssignmentContainer(index, name) {
+                const container = document.createElement('div');
+                container.className = `${index === 1 ? 'col-span-2' : ''} bg-[#1a1512] rounded-lg border-2 border-dashed border-[#3d322d] p-4`;
+                container.setAttribute('ondragover', 'event.preventDefault();');
+                container.setAttribute('ondrop', 'handleDrop(event, this)');
+                container.innerHTML = `
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="${index === 1 ? 'text-base' : 'text-sm'} font-medium text-gray-300" 
+                            data-position-index="${index}"
+                            data-default-name="${name}">
+                            ${name}
+                        </h3>
+                        <button onclick="editLabel(this)" class="text-xs text-orange-400 hover:text-orange-300">Edit</button>
+                    </div>
+                `;
+                return container;
+            }
+
+            // Function to move unit to available units
+            function moveUnitToAvailable(unit) {
+                const unitName = unit.querySelector('.unit-name').textContent;
+                const availableUnitsContainer = document.getElementById('availableUnitsContainer');
+                
+                // Create new unit element for available units
+                const newUnit = document.createElement('div');
+                newUnit.className = 'draggable-unit p-3 rounded-md';
+                newUnit.draggable = true;
+                newUnit.ondragstart = function(e) { handleDragStart(e) };
+                newUnit.innerHTML = `
+                    <div class="flex items-center">
+                        <span class="unit-name font-medium text-gray-300">${unitName}</span>
+                    </div>
+                `;
+                
+                availableUnitsContainer.appendChild(newUnit);
+            }
 
             // Function to apply template
             function applyTemplate(templateName) {
-                // Only select headers within the assignment containers grid
-                const containers = document.querySelectorAll('.col-span-3 [ondrop] h3');
-                containers.forEach(header => {
-                    const index = parseInt(header.getAttribute('data-position-index'));
-                    if (!isNaN(index)) { // Only apply template if it has a position index
-                        header.textContent = templates[templateName](index);
+                const template = templates[templateName];
+                const assignmentGrid = document.querySelector('.col-span-3 .grid');
+                const currentContainers = Array.from(assignmentGrid.children);
+                
+                // Move all units except Incident Commander to available units
+                currentContainers.forEach(container => {
+                    const unit = container.querySelector('.draggable-unit');
+                    const position = container.querySelector('h3')?.textContent.trim();
+                    
+                    if (unit && position !== 'Incident Commander') {
+                        // Show notification
+                        const notification = document.createElement('div');
+                        notification.className = 'fixed bottom-4 right-4 bg-orange-400 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+                        notification.textContent = `Unit ${unit.querySelector('.unit-name').textContent} moved to Available Units`;
+                        document.body.appendChild(notification);
+                        
+                        // Move unit to available
+                        moveUnitToAvailable(unit);
+                        
+                        // Remove notification after 3 seconds
+                        setTimeout(() => notification.remove(), 3000);
                     }
                 });
+
+                // Clear existing containers
+                assignmentGrid.innerHTML = '';
+
+                // Create new containers
+                for (let i = 1; i <= template.count; i++) {
+                    const container = createAssignmentContainer(i, template.getName(i));
+                    assignmentGrid.appendChild(container);
+                }
 
                 // Save template preference
                 localStorage.setItem('selectedTemplate', templateName);
@@ -590,11 +661,9 @@
 
             // Load saved template preference
             document.addEventListener('DOMContentLoaded', function() {
-                const savedTemplate = localStorage.getItem('selectedTemplate');
-                if (savedTemplate) {
-                    document.getElementById('templateSelector').value = savedTemplate;
-                    applyTemplate(savedTemplate);
-                }
+                const savedTemplate = localStorage.getItem('selectedTemplate') || 'default';
+                document.getElementById('templateSelector').value = savedTemplate;
+                applyTemplate(savedTemplate);
             });
 
             // Start the timer update interval
