@@ -1,25 +1,12 @@
 <x-app-layout>
-    <x-slot name="header">
-        Incident #{{ $fire->incident_id }}
-    </x-slot>
-
     <div class="space-y-6">
         <!-- Incident Overview -->
         <div class="bg-white rounded-lg shadow-sm border border-gray-200">
             <div class="border-b border-gray-200 px-6 py-4">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center space-x-3">
-                        <div @class([
-                            'w-3 h-3 rounded-full',
-                            'bg-yellow-400' => $fire->status === 'ENRT',
-                            'bg-green-500' => $fire->status === 'ARRVD',
-                            'bg-blue-500' => $fire->status === 'ENRTH',
-                            'bg-gray-400' => !in_array($fire->status, ['ENRT', 'ARRVD', 'ENRTH'])
-                        ])></div>
-                        <h2 class="text-lg font-semibold text-gray-900">{{ $fire->nature }}</h2>
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#D2691E]/10 text-[#D2691E]">
-                            {{ $fire->status }}
-                        </span>
+                        <h2 class="text-lg font-semibold text-gray-900">Incident #{{ $fire->incident_id }}</h2>
+                        <span class="text-sm text-gray-500">{{ $fire->nature }}</span>
                     </div>
                     <div class="text-sm text-gray-500">
                         {{ $fire->date->format('M j, Y g:i A') }}
@@ -75,7 +62,7 @@
         </div>
 
         <!-- Incident Timer -->
-        <div id="incidentTimer" class="hidden mb-6 text-center">
+        <div id="incidentTimer" class="hidden mb-6 text-center transition-colors duration-300">
             <div class="inline-flex items-center space-x-2 text-4xl font-bold text-gray-700">
                 <span id="timerHours">00</span>
                 <span>:</span>
@@ -85,6 +72,17 @@
             </div>
             <div class="text-sm text-gray-500 mt-1">Incident Duration</div>
         </div>
+
+        <!-- Add CSS for flashing animation -->
+        <style>
+            @keyframes flash-warning {
+                0%, 100% { opacity: 1; }
+                50% { opacity: 0.7; }
+            }
+            .flash-warning {
+                animation: flash-warning 2s infinite;
+            }
+        </style>
 
         <!-- Unit Assignment Container -->
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
@@ -157,21 +155,75 @@
         <script>
             let timerInterval;
             let startTime;
+            const TWO_MINUTES = 2 * 60 * 1000; // 2 minutes in milliseconds
 
             function formatNumber(number) {
                 return number.toString().padStart(2, '0');
             }
 
-            function updateTimer() {
+            function formatTime(milliseconds) {
+                const hours = Math.floor(milliseconds / (1000 * 60 * 60));
+                const minutes = Math.floor((milliseconds % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((milliseconds % (1000 * 60)) / 1000);
+                return `${formatNumber(hours)}:${formatNumber(minutes)}:${formatNumber(seconds)}`;
+            }
+
+            function updateMasterTimer() {
                 const now = new Date();
                 const diff = now - startTime;
-                const hours = Math.floor(diff / (1000 * 60 * 60));
-                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+                const [hours, minutes, seconds] = formatTime(diff).split(':');
+                
+                document.getElementById('timerHours').textContent = hours;
+                document.getElementById('timerMinutes').textContent = minutes;
+                document.getElementById('timerSeconds').textContent = seconds;
 
-                document.getElementById('timerHours').textContent = formatNumber(hours);
-                document.getElementById('timerMinutes').textContent = formatNumber(minutes);
-                document.getElementById('timerSeconds').textContent = formatNumber(seconds);
+                // Check all unit timers
+                const allUnits = document.querySelectorAll('[id^="unit-"]');
+                let hasOvertime = false;
+                
+                allUnits.forEach(unit => {
+                    if (unit.classList.contains('text-red-600')) {
+                        hasOvertime = true;
+                    }
+                });
+
+                const masterTimer = document.getElementById('incidentTimer');
+                if (hasOvertime) {
+                    masterTimer.classList.add('text-red-600');
+                } else {
+                    masterTimer.classList.remove('text-red-600');
+                    masterTimer.classList.add('text-green-600');
+                }
+            }
+
+            function updateUnitTimer(unitElement) {
+                const startTimeAttr = unitElement.getAttribute('data-start-time');
+                if (!startTimeAttr) return;
+
+                const unitStartTime = parseInt(startTimeAttr);
+                const now = new Date().getTime();
+                const diff = now - unitStartTime;
+                
+                const timerElement = unitElement.querySelector('.unit-timer');
+                const statusDot = unitElement.querySelector('.status-dot');
+                
+                if (timerElement && statusDot) {
+                    timerElement.textContent = formatTime(diff);
+                    
+                    if (diff >= TWO_MINUTES) {
+                        timerElement.classList.remove('text-green-600');
+                        timerElement.classList.add('text-red-600');
+                        statusDot.classList.remove('bg-green-500');
+                        statusDot.classList.add('bg-red-500');
+                        unitElement.classList.add('flash-warning');
+                    } else {
+                        timerElement.classList.add('text-green-600');
+                        timerElement.classList.remove('text-red-600');
+                        statusDot.classList.add('bg-green-500');
+                        statusDot.classList.remove('bg-red-500');
+                        unitElement.classList.remove('flash-warning');
+                    }
+                }
             }
 
             function startTimer() {
@@ -179,7 +231,10 @@
                     const timerElement = document.getElementById('incidentTimer');
                     timerElement.classList.remove('hidden');
                     startTime = new Date();
-                    timerInterval = setInterval(updateTimer, 1000);
+                    timerInterval = setInterval(() => {
+                        updateMasterTimer();
+                        document.querySelectorAll('[id^="unit-"]').forEach(updateUnitTimer);
+                    }, 1000);
                 }
             }
 
@@ -197,7 +252,6 @@
                 // Find the source element
                 let sourceElement;
                 if (sourceId === 'available') {
-                    // Find the element in the available units container by text content
                     const availableUnits = document.querySelectorAll('[draggable=true]');
                     sourceElement = Array.from(availableUnits).find(el => el.textContent.trim() === data);
                 } else {
@@ -214,8 +268,19 @@
                 draggedElement.className = 'bg-white p-3 rounded shadow-sm border border-gray-200 cursor-move hover:shadow-md transition-shadow';
                 draggedElement.draggable = true;
                 draggedElement.ondragstart = function(e) { handleDragStart(e) };
-                draggedElement.innerHTML = data;
-                draggedElement.id = `unit-${Date.now()}`; // Unique ID for tracking
+                draggedElement.id = `unit-${Date.now()}`;
+                draggedElement.setAttribute('data-start-time', Date.now());
+
+                // Add unit content with timer and status dot
+                draggedElement.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <div class="status-dot w-2 h-2 rounded-full bg-green-500 mr-2"></div>
+                            <span>${data}</span>
+                        </div>
+                        <span class="unit-timer text-xs font-mono text-green-600">00:00:00</span>
+                    </div>
+                `;
 
                 // Add to the new container
                 container.appendChild(draggedElement);
@@ -225,6 +290,9 @@
                 if (isICPosition) {
                     startTimer();
                 }
+
+                // Start updating this unit's timer
+                updateUnitTimer(draggedElement);
             }
 
             function editLabel(button) {
