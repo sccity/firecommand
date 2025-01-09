@@ -74,6 +74,11 @@
             </div>
         </div>
 
+        <!-- Empty Container -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <!-- Content will go here -->
+        </div>
+
         <!-- Action Buttons -->
         <div class="flex space-x-4">
             <button class="flex-1 flex items-center justify-center px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors group">
