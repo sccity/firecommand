@@ -30,8 +30,6 @@ Route::middleware('auth')->group(function () {
         Route::get('/command/{fire}', [CommandController::class, 'show'])->name('command.show');
     });
 
-    Route::get('/fire/command', [FireController::class, 'index'])->name('fire.command');
-    Route::get('/fire/unit-location', [FireController::class, 'getUnitLocation'])->name('fire.unit-location');
 });
 
 require __DIR__.'/auth.php';
