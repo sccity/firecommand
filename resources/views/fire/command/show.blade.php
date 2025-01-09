@@ -1,46 +1,46 @@
-<x-app-layout>
-    <div class="space-y-6">
+<x-app-layout class="bg-[#1a1512]">
+    <div class="space-y-6 bg-[#1a1512] min-h-screen p-6">
         <!-- Incident Overview -->
-        <div class="bg-white rounded-lg shadow-sm border border-gray-200">
-            <div class="border-b border-gray-200 px-6 py-4">
+        <div class="bg-[#2b2320] rounded-lg shadow-lg border border-[#3d322d]">
+            <div class="border-b border-[#3d322d] px-6 py-4">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center space-x-3">
-                        <h2 class="text-lg font-semibold text-gray-900">Incident #{{ $fire->incident_id }}</h2>
-                        <span class="text-sm text-gray-500">{{ $fire->nature }}</span>
+                        <h2 class="text-lg font-semibold text-gray-100">Incident #{{ $fire->incident_id }}</h2>
+                        <span class="text-sm text-gray-400">{{ $fire->nature }}</span>
                     </div>
-                    <div class="text-sm text-gray-500">
+                    <div class="text-sm text-gray-400">
                         {{ $fire->date->format('M j, Y g:i A') }}
                     </div>
                 </div>
             </div>
             
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-gray-200">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-[#3d322d]">
                 <div class="p-6">
-                    <h3 class="text-sm font-medium text-gray-500">Location</h3>
+                    <h3 class="text-sm font-medium text-gray-400">Location</h3>
                     <div class="mt-2">
-                        <p class="text-sm text-gray-900">{{ $fire->address }}</p>
-                        <p class="text-sm text-gray-900">{{ $fire->city }}</p>
-                        <p class="mt-1 text-sm text-gray-500">Zone: {{ $fire->zone }}</p>
+                        <p class="text-sm text-gray-300">{{ $fire->address }}</p>
+                        <p class="text-sm text-gray-300">{{ $fire->city }}</p>
+                        <p class="mt-1 text-sm text-gray-400">Zone: {{ $fire->zone }}</p>
                     </div>
                 </div>
 
                 <div class="p-6">
-                    <h3 class="text-sm font-medium text-gray-500">Response</h3>
+                    <h3 class="text-sm font-medium text-gray-400">Response</h3>
                     <div class="mt-2">
-                        <p class="text-sm text-gray-900">Unit: {{ $fire->responsible_unit }}</p>
-                        <p class="text-sm text-gray-900">Agency: {{ $fire->agency }}</p>
-                        <p class="mt-1 text-sm text-gray-500">Time: {{ $fire->status_time }}</p>
+                        <p class="text-sm text-gray-300">Unit: {{ $fire->responsible_unit }}</p>
+                        <p class="text-sm text-gray-300">Agency: {{ $fire->agency }}</p>
+                        <p class="mt-1 text-sm text-gray-400">Time: {{ $fire->status_time }}</p>
                     </div>
                 </div>
 
                 <div class="p-6">
-                    <h3 class="text-sm font-medium text-gray-500">Coordinates</h3>
+                    <h3 class="text-sm font-medium text-gray-400">Coordinates</h3>
                     <div class="mt-2">
-                        <p class="text-sm text-gray-900">Lat: {{ $fire->latitude }}</p>
-                        <p class="text-sm text-gray-900">Long: {{ $fire->longitude }}</p>
+                        <p class="text-sm text-gray-300">Lat: {{ $fire->latitude }}</p>
+                        <p class="text-sm text-gray-300">Long: {{ $fire->longitude }}</p>
                         <a href="https://www.google.com/maps?q={{ $fire->latitude }},{{ $fire->longitude }}" 
                            target="_blank"
-                           class="mt-2 inline-flex items-center text-sm text-[#D2691E] hover:text-[#A0522D]">
+                           class="mt-2 inline-flex items-center text-sm text-orange-400 hover:text-orange-300">
                             <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -51,11 +51,11 @@
                 </div>
 
                 <div class="p-6">
-                    <h3 class="text-sm font-medium text-gray-500">Call Details</h3>
+                    <h3 class="text-sm font-medium text-gray-400">Call Details</h3>
                     <div class="mt-2">
-                        <p class="text-sm text-gray-900">Call ID: {{ $fire->call_id }}</p>
-                        <p class="text-sm text-gray-900">Call #: {{ $fire->callnum }}</p>
-                        <p class="mt-1 text-sm text-gray-500">Type: {{ $fire->type }}</p>
+                        <p class="text-sm text-gray-300">Call ID: {{ $fire->call_id }}</p>
+                        <p class="text-sm text-gray-300">Call #: {{ $fire->callnum }}</p>
+                        <p class="mt-1 text-sm text-gray-400">Type: {{ $fire->type }}</p>
                     </div>
                 </div>
             </div>
@@ -63,20 +63,25 @@
 
         <!-- Incident Timer -->
         <div id="incidentTimer" class="hidden mb-6 text-center transition-colors duration-300">
-            <div class="inline-flex items-center space-x-2">
-                <div class="master-status-dot w-3 h-3 rounded-full bg-green-500 mr-2"></div>
-                <div class="inline-flex items-center space-x-2 text-4xl font-bold text-gray-700">
-                    <span id="timerHours" class="timer-text">00</span>
-                    <span class="timer-text">:</span>
-                    <span id="timerMinutes" class="timer-text">00</span>
-                    <span class="timer-text">:</span>
-                    <span id="timerSeconds" class="timer-text">00</span>
+            <div class="inline-flex items-center space-x-4">
+                <div class="inline-flex items-center space-x-2">
+                    <div class="master-status-dot w-3 h-3 rounded-full bg-green-500 mr-2"></div>
+                    <div class="inline-flex items-center space-x-2 text-4xl font-bold text-gray-100">
+                        <span id="timerHours" class="timer-text">00</span>
+                        <span class="timer-text">:</span>
+                        <span id="timerMinutes" class="timer-text">00</span>
+                        <span class="timer-text">:</span>
+                        <span id="timerSeconds" class="timer-text">00</span>
+                    </div>
                 </div>
+                <button onclick="resetAllTimers()" class="p-2 text-orange-400 hover:text-orange-300 transition-colors border border-orange-400/20 hover:border-orange-400/40 rounded-full">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                </button>
             </div>
-            <div class="text-sm text-gray-500 mt-1">Incident Duration</div>
         </div>
 
-        <!-- Add CSS for flashing animation -->
         <style>
             @keyframes flash-warning {
                 0%, 100% { opacity: 1; }
@@ -92,42 +97,42 @@
                 transition: background-color 0.3s ease;
             }
             .draggable-unit {
-                background: linear-gradient(to bottom, #ffffff 0%, #f5f5f5 100%);
-                border: 1px solid #e5e5e5;
+                background: linear-gradient(to bottom, #2b2320 0%, #1a1512 100%);
+                border: 1px solid #3d322d;
                 box-shadow: 
-                    inset 0 1px 0 rgba(255,255,255,0.9),
-                    0 1px 2px rgba(0,0,0,0.05);
+                    inset 0 1px 0 rgba(255,255,255,0.05),
+                    0 1px 2px rgba(0,0,0,0.2);
                 cursor: move;
                 transition: all 0.2s ease;
                 user-select: none;
             }
             .draggable-unit:hover {
-                background: linear-gradient(to bottom, #f8f8f8 0%, #f0f0f0 100%);
+                background: linear-gradient(to bottom, #3d322d 0%, #2b2320 100%);
                 border-color: #D2691E;
                 box-shadow: 
-                    inset 0 1px 0 rgba(255,255,255,0.9),
+                    inset 0 1px 0 rgba(255,255,255,0.05),
                     0 2px 4px rgba(210,105,30,0.1);
                 transform: translateY(-1px);
             }
             .draggable-unit:active {
-                background: linear-gradient(to bottom, #f0f0f0 0%, #e8e8e8 100%);
+                background: linear-gradient(to bottom, #1a1512 0%, #2b2320 100%);
                 box-shadow: 
-                    inset 0 1px 2px rgba(0,0,0,0.1),
-                    0 1px 2px rgba(0,0,0,0.05);
+                    inset 0 1px 2px rgba(0,0,0,0.2),
+                    0 1px 2px rgba(0,0,0,0.1);
                 transform: translateY(0px);
             }
         </style>
 
         <!-- Unit Assignment Container -->
-        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div class="bg-[#2b2320] rounded-lg shadow-lg border border-[#3d322d] p-6">
             <div class="grid grid-cols-5 gap-6">
                 <!-- Available Units Container -->
-                <div class="col-span-2 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300 p-4 min-h-[600px]"
+                <div class="col-span-2 bg-[#1a1512] rounded-lg border-2 border-dashed border-[#3d322d] p-4 min-h-[600px]"
                      ondragover="event.preventDefault();"
                      ondrop="handleDrop(event, this)">
                     <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-base font-medium text-gray-700">Available Units</h3>
-                        <button onclick="editLabel(this)" class="text-xs text-[#D2691E] hover:text-[#A0522D]">Edit</button>
+                        <h3 class="text-base font-medium text-gray-300">Available Units</h3>
+                        <button onclick="editLabel(this)" class="text-xs text-orange-400 hover:text-orange-300">Edit</button>
                     </div>
                     <!-- Example Draggable Units -->
                     <div class="space-y-2">
@@ -135,35 +140,35 @@
                              draggable="true"
                              ondragstart="handleDragStart(event)">
                             <div class="flex items-center">
-                                <span class="font-medium text-gray-700">Engine 1</span>
+                                <span class="unit-name font-medium text-gray-300">Engine 1</span>
                             </div>
                         </div>
                         <div class="draggable-unit p-3 rounded-md"
                              draggable="true"
                              ondragstart="handleDragStart(event)">
                             <div class="flex items-center">
-                                <span class="font-medium text-gray-700">Engine 2</span>
+                                <span class="unit-name font-medium text-gray-300">Engine 2</span>
                             </div>
                         </div>
                         <div class="draggable-unit p-3 rounded-md"
                              draggable="true"
                              ondragstart="handleDragStart(event)">
                             <div class="flex items-center">
-                                <span class="font-medium text-gray-700">Truck 1</span>
+                                <span class="unit-name font-medium text-gray-300">Truck 1</span>
                             </div>
                         </div>
                         <div class="draggable-unit p-3 rounded-md"
                              draggable="true"
                              ondragstart="handleDragStart(event)">
                             <div class="flex items-center">
-                                <span class="font-medium text-gray-700">Medic 1</span>
+                                <span class="unit-name font-medium text-gray-300">Medic 1</span>
                             </div>
                         </div>
                         <div class="draggable-unit p-3 rounded-md"
                              draggable="true"
                              ondragstart="handleDragStart(event)">
                             <div class="flex items-center">
-                                <span class="font-medium text-gray-700">Battalion 1</span>
+                                <span class="unit-name font-medium text-gray-300">Battalion 1</span>
                             </div>
                         </div>
                     </div>
@@ -172,23 +177,23 @@
                 <!-- Assignment Containers Grid -->
                 <div class="col-span-3 grid grid-cols-2 gap-4">
                     <!-- Incident Commander - Special First Position -->
-                    <div class="col-span-2 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300 p-4"
+                    <div class="col-span-2 bg-[#1a1512] rounded-lg border-2 border-dashed border-[#3d322d] p-4"
                          ondragover="event.preventDefault();"
                          ondrop="handleDrop(event, this)">
                         <div class="flex items-center justify-between mb-2">
-                            <h3 class="text-base font-medium text-gray-700">Incident Commander</h3>
-                            <button onclick="editLabel(this)" class="text-xs text-[#D2691E] hover:text-[#A0522D]">Edit</button>
+                            <h3 class="text-base font-medium text-gray-300">Incident Commander</h3>
+                            <button onclick="editLabel(this)" class="text-xs text-orange-400 hover:text-orange-300">Edit</button>
                         </div>
                     </div>
 
                     <!-- Regular Assignment Positions -->
                     @for ($i = 1; $i <= 8; $i++)
-                        <div class="bg-gray-50 rounded-lg border-2 border-dashed border-gray-300 p-4"
+                        <div class="bg-[#1a1512] rounded-lg border-2 border-dashed border-[#3d322d] p-4"
                              ondragover="event.preventDefault();"
                              ondrop="handleDrop(event, this)">
                             <div class="flex items-center justify-between mb-2">
-                                <h3 class="text-sm font-medium text-gray-700">Assignment {{ $i }}</h3>
-                                <button onclick="editLabel(this)" class="text-xs text-[#D2691E] hover:text-[#A0522D]">Edit</button>
+                                <h3 class="text-sm font-medium text-gray-300">Assignment {{ $i }}</h3>
+                                <button onclick="editLabel(this)" class="text-xs text-orange-400 hover:text-orange-300">Edit</button>
                             </div>
                         </div>
                     @endfor
@@ -214,22 +219,34 @@
 
             function updateMasterTimer() {
                 const now = new Date();
-                const diff = now - startTime;
-                const [hours, minutes, seconds] = formatTime(diff).split(':');
                 
+                // Find all units except IC
+                const allUnits = Array.from(document.querySelectorAll('[id^="unit-"]')).filter(unit => {
+                    const container = unit.closest('div[ondrop]');
+                    return !container.querySelector('h3')?.textContent.includes('Incident Commander');
+                });
+
+                let maxDiff = 0;
+                let hasOvertime = false;
+
+                allUnits.forEach(unit => {
+                    const startTimeAttr = unit.getAttribute('data-start-time');
+                    if (startTimeAttr) {
+                        const unitStartTime = parseInt(startTimeAttr);
+                        const diff = now.getTime() - unitStartTime;
+                        maxDiff = Math.max(maxDiff, diff);
+                        
+                        if (diff >= TWO_MINUTES) {
+                            hasOvertime = true;
+                        }
+                    }
+                });
+
+                // Update master timer with longest time
+                const [hours, minutes, seconds] = formatTime(maxDiff).split(':');
                 document.getElementById('timerHours').textContent = hours;
                 document.getElementById('timerMinutes').textContent = minutes;
                 document.getElementById('timerSeconds').textContent = seconds;
-
-                // Check all unit timers
-                const allUnits = document.querySelectorAll('[id^="unit-"]');
-                let hasOvertime = false;
-                
-                allUnits.forEach(unit => {
-                    if (unit.querySelector('.status-dot')?.classList.contains('bg-red-500')) {
-                        hasOvertime = true;
-                    }
-                });
 
                 const masterTimer = document.getElementById('incidentTimer');
                 const masterDot = masterTimer.querySelector('.master-status-dot');
@@ -331,27 +348,37 @@
                 draggedElement.draggable = true;
                 draggedElement.ondragstart = function(e) { handleDragStart(e) };
                 draggedElement.id = `unit-${Date.now()}`;
-                draggedElement.setAttribute('data-start-time', Date.now());
+                
+                // Only set start time if not IC position
+                if (!isICPosition) {
+                    draggedElement.setAttribute('data-start-time', Date.now());
+                }
 
                 // Add unit content with timer and status dot
-                draggedElement.innerHTML = `
-                    <div class="flex items-center justify-between">
+                if (isICPosition) {
+                    draggedElement.innerHTML = `
                         <div class="flex items-center">
-                            <div class="status-dot w-2 h-2 rounded-full bg-green-500 mr-2"></div>
-                            <span class="unit-name font-medium text-gray-700">${data}</span>
+                            <span class="unit-name font-medium text-gray-300">${data}</span>
                         </div>
-                        <div class="flex items-center space-x-2">
-                            ${!isICPosition ? `
-                                <button onclick="resetUnitTimer(this)" class="text-xs text-[#D2691E] hover:text-[#A0522D] transition-colors">
+                    `;
+                } else {
+                    draggedElement.innerHTML = `
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <div class="status-dot w-2 h-2 rounded-full bg-green-500 mr-2"></div>
+                                <span class="unit-name font-medium text-gray-300">${data}</span>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <button onclick="resetUnitTimer(this)" class="text-xs text-orange-400 hover:text-orange-300 transition-colors">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                                     </svg>
                                 </button>
-                            ` : ''}
-                            <span class="unit-timer text-xs font-mono text-green-600">00:00:00</span>
+                                <span class="unit-timer text-xs font-mono text-green-600">00:00:00</span>
+                            </div>
                         </div>
-                    </div>
-                `;
+                    `;
+                }
 
                 // Add to the new container
                 container.appendChild(draggedElement);
@@ -361,8 +388,10 @@
                     startTimer();
                 }
 
-                // Start updating this unit's timer
-                updateUnitTimer(draggedElement);
+                // Start updating this unit's timer if not IC
+                if (!isICPosition) {
+                    updateUnitTimer(draggedElement);
+                }
             }
 
             function resetUnitTimer(button) {
@@ -384,23 +413,13 @@
                 }
             }
 
-            // Update the initial unit HTML to include the unit-name class
-            document.querySelectorAll('.draggable-unit').forEach(unit => {
-                const unitText = unit.textContent.trim();
-                unit.innerHTML = `
-                    <div class="flex items-center">
-                        <span class="unit-name font-medium text-gray-700">${unitText}</span>
-                    </div>
-                `;
-            });
-
             function editLabel(button) {
                 const header = button.parentElement.querySelector('h3');
                 const currentText = header.textContent;
                 const input = document.createElement('input');
                 input.type = 'text';
                 input.value = currentText;
-                input.className = 'text-sm border rounded px-2 py-1 w-full';
+                input.className = 'text-sm border rounded px-2 py-1 w-full bg-gray-800 text-gray-300 border-gray-600 focus:border-orange-500 focus:ring-1 focus:ring-orange-500';
                 
                 input.onblur = function() {
                     header.textContent = this.value;
@@ -416,6 +435,33 @@
                 header.replaceWith(input);
                 input.focus();
             }
+
+            function resetAllTimers() {
+                const now = Date.now();
+                // Find all units except IC
+                const allUnits = Array.from(document.querySelectorAll('[id^="unit-"]')).filter(unit => {
+                    const container = unit.closest('div[ondrop]');
+                    return !container.querySelector('h3')?.textContent.includes('Incident Commander');
+                });
+
+                allUnits.forEach(unit => {
+                    unit.setAttribute('data-start-time', now);
+                    const statusDot = unit.querySelector('.status-dot');
+                    const timerElement = unit.querySelector('.unit-timer');
+                    
+                    if (statusDot && timerElement) {
+                        // Reset visual states
+                        statusDot.classList.remove('bg-red-500');
+                        statusDot.classList.add('bg-green-500');
+                        timerElement.classList.remove('text-red-600');
+                        timerElement.classList.add('text-green-600');
+                        unit.classList.remove('flash-warning');
+                    }
+                });
+
+                // Update master timer immediately
+                updateMasterTimer();
+            }
         </script>
 
         <!-- Action Buttons -->
@@ -427,14 +473,14 @@
                 <span class="font-medium">Update Status</span>
             </button>
 
-            <button class="flex-1 flex items-center justify-center px-4 py-3 bg-[#D2691E] text-white rounded-lg hover:bg-[#A0522D] transition-colors group">
+            <button class="flex-1 flex items-center justify-center px-4 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors group">
                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
                 <span class="font-medium">Assign Resources</span>
             </button>
 
-            <button class="flex-1 flex items-center justify-center px-4 py-3 bg-[#D2691E] text-white rounded-lg hover:bg-[#A0522D] transition-colors group">
+            <button class="flex-1 flex items-center justify-center px-4 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors group">
                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>

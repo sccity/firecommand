@@ -17,25 +17,25 @@
         <!-- Alpine.js -->
         <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     </head>
-    <body class="font-sans antialiased bg-gradient-to-br from-[#F5F5F5] to-[#E5E5E5]">
-        <div class="min-h-screen flex bg-[url('/images/texture.png')] bg-repeat">
+    <body class="font-sans antialiased bg-[#1a1512]">
+        <div class="min-h-screen flex bg-[#1a1512]">
             <!-- Sidebar -->
             @auth
                 @include('layouts.partials.sidebar')
             @endauth
 
             <!-- Main Content -->
-            <div class="flex-1 flex flex-col min-h-screen">
+            <div class="flex-1 flex flex-col min-h-screen bg-[#1a1512]">
                 <!-- Page Content -->
-                <main class="flex-1 p-8">
+                <main class="flex-1">
                     @isset($header)
                         <header class="mb-8">
-                            <div class="flex items-center justify-between bg-white rounded-xl shadow-sm border border-gray-200/50 px-6 py-4">
-                                <h1 class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#2F1810] to-[#8B4513]">
+                            <div class="flex items-center justify-between bg-[#2b2320] rounded-xl shadow-sm border border-[#3d322d] px-6 py-4">
+                                <h1 class="text-2xl font-bold text-gray-100">
                                     {{ $header }}
                                 </h1>
                                 <div class="flex items-center space-x-4">
-                                    <span class="text-sm text-gray-500">{{ now()->format('l, F j, Y') }}</span>
+                                    <span class="text-sm text-gray-400">{{ now()->format('l, F j, Y') }}</span>
                                 </div>
                             </div>
                         </header>
@@ -47,13 +47,13 @@
                 </main>
 
                 <!-- Footer -->
-                <footer class="bg-white border-t border-gray-200 shadow-sm">
+                <footer class="bg-[#2b2320] border-t border-[#3d322d] shadow-sm">
                     <div class="max-w-7xl mx-auto py-4 px-8">
                         <div class="flex items-center justify-between">
-                            <div class="text-sm text-gray-600">
+                            <div class="text-sm text-gray-400">
                                 &copy; {{ date('Y') }} City of Santa Clara, Utah
                             </div>
-                            <div class="text-sm text-gray-500">
+                            <div class="text-sm text-gray-400">
                                 All rights reserved
                             </div>
                         </div>
