@@ -15,40 +15,32 @@ class RolesAndPermissionsSeeder extends Seeder
         app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
         // Create permissions
-        $permissions = [
-            'access_dashboard',
-            'manage_users',
-            'manage_roles',
-            'view_reports',
-            'edit_reports',
-            'access_hr_module',
-            'access_finance_module',
-            'access_it_module',
-        ];
-
-        foreach ($permissions as $permission) {
-            Permission::create(['name' => $permission]);
-        }
+        Permission::create(['name' => 'manage users']);
+        Permission::create(['name' => 'manage fires']);
+        Permission::create(['name' => 'manage assignments']);
+        Permission::create(['name' => 'view fires']);
+        Permission::create(['name' => 'create fires']);
+        Permission::create(['name' => 'edit fires']);
+        Permission::create(['name' => 'delete fires']);
 
         // Create roles and assign permissions
-        $roles = [
-            'super_admin' => $permissions,
-            'department_head' => [
-                'access_dashboard',
-                'view_reports',
-                'edit_reports',
-                'access_hr_module',
-                'access_finance_module',
-            ],
-            'employee' => [
-                'access_dashboard',
-                'view_reports',
-            ],
-        ];
+        $admin = Role::create(['name' => 'admin']);
+        $admin->givePermissionTo(Permission::all());
 
-        foreach ($roles as $role => $rolePermissions) {
-            $role = Role::create(['name' => $role]);
-            $role->givePermissionTo($rolePermissions);
-        }
+        $commander = Role::create(['name' => 'commander']);
+        $commander->givePermissionTo([
+            'manage fires',
+            'manage assignments',
+            'view fires',
+            'create fires',
+            'edit fires'
+        ]);
+
+        $dispatcher = Role::create(['name' => 'dispatcher']);
+        $dispatcher->givePermissionTo([
+            'view fires',
+            'create fires',
+            'edit fires'
+        ]);
     }
 }

@@ -392,9 +392,11 @@
             }
 
             function resetAllTimers() {
+                const now = new Date().getTime();
                 const allUnits = document.querySelectorAll('[id^="unit-"]');
                 allUnits.forEach(unit => {
-                    unit.removeAttribute('data-start-time');
+                    // Instead of removing the attribute, set it to the current time
+                    unit.setAttribute('data-start-time', now.toString());
                     const statusDot = unit.querySelector('.status-dot');
                     const timerElement = unit.querySelector('.unit-timer');
                     
@@ -405,7 +407,29 @@
                         timerElement.classList.remove('text-red-600');
                         timerElement.classList.add('text-green-600');
                         unit.classList.remove('flash-warning');
+                        timerElement.textContent = '00:00:00';
                     }
+
+                    // Update the start time in the database for each unit
+                    const unitName = unit.querySelector('.unit-name').textContent.trim();
+                    const position = unit.closest('[ondrop]').querySelector('h3').textContent.trim();
+                    
+                    fetch(`/fire/command/{{ $fire->id }}/assignments`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            unit: unitName,
+                            position: position,
+                            start_time: now
+                        })
+                    })
+                    .catch(error => {
+                        console.error('Error updating timer:', error);
+                    });
                 });
                 updateMasterTimer();
             }
