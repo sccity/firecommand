@@ -140,35 +140,7 @@
                              draggable="true"
                              ondragstart="handleDragStart(event)">
                             <div class="flex items-center">
-                                <span class="unit-name font-medium text-gray-300">Engine 1</span>
-                            </div>
-                        </div>
-                        <div class="draggable-unit p-3 rounded-md"
-                             draggable="true"
-                             ondragstart="handleDragStart(event)">
-                            <div class="flex items-center">
-                                <span class="unit-name font-medium text-gray-300">Engine 2</span>
-                            </div>
-                        </div>
-                        <div class="draggable-unit p-3 rounded-md"
-                             draggable="true"
-                             ondragstart="handleDragStart(event)">
-                            <div class="flex items-center">
-                                <span class="unit-name font-medium text-gray-300">Truck 1</span>
-                            </div>
-                        </div>
-                        <div class="draggable-unit p-3 rounded-md"
-                             draggable="true"
-                             ondragstart="handleDragStart(event)">
-                            <div class="flex items-center">
-                                <span class="unit-name font-medium text-gray-300">Medic 1</span>
-                            </div>
-                        </div>
-                        <div class="draggable-unit p-3 rounded-md"
-                             draggable="true"
-                             ondragstart="handleDragStart(event)">
-                            <div class="flex items-center">
-                                <span class="unit-name font-medium text-gray-300">Battalion 1</span>
+                                <span class="unit-name font-medium text-gray-300">{{ $fire->responsible_unit }}</span>
                             </div>
                         </div>
                     </div>
