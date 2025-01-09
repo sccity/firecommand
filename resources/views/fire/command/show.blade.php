@@ -133,7 +133,6 @@
                      ondrop="handleDrop(event, this)">
                     <div class="flex items-center justify-between mb-4">
                         <h3 class="text-base font-medium text-gray-300">Available Units</h3>
-                        <button onclick="editLabel(this)" class="text-xs text-orange-400 hover:text-orange-300">Edit</button>
                     </div>
                     <!-- Example Draggable Units -->
                     <div id="availableUnitsContainer" class="space-y-2">
@@ -142,28 +141,37 @@
                 </div>
 
                 <!-- Assignment Containers Grid -->
-                <div class="col-span-3 grid grid-cols-2 gap-4">
-                    <!-- Incident Commander - Special First Position -->
-                    <div class="col-span-2 bg-[#1a1512] rounded-lg border-2 border-dashed border-[#3d322d] p-4"
-                         ondragover="event.preventDefault();"
-                         ondrop="handleDrop(event, this)">
-                        <div class="flex items-center justify-between mb-2">
-                            <h3 class="text-base font-medium text-gray-300">Incident Commander</h3>
-                            <button onclick="editLabel(this)" class="text-xs text-orange-400 hover:text-orange-300">Edit</button>
-                        </div>
+                <div class="col-span-3">
+                    <!-- Template Selector -->
+                    <div class="mb-4">
+                        <select id="templateSelector" class="bg-[#2b2320] text-gray-300 border border-[#3d322d] rounded-lg px-3 py-2 focus:border-orange-500 focus:ring-1 focus:ring-orange-500">
+                            <option value="default">Default Template</option>
+                            <option value="template1">Template 1 (A-Style)</option>
+                            <option value="template2">Template 2 (B-Style)</option>
+                        </select>
                     </div>
-
-                    <!-- Regular Assignment Positions -->
-                    @for ($i = 1; $i <= 8; $i++)
-                        <div class="bg-[#1a1512] rounded-lg border-2 border-dashed border-[#3d322d] p-4"
-                             ondragover="event.preventDefault();"
-                             ondrop="handleDrop(event, this)">
-                            <div class="flex items-center justify-between mb-2">
-                                <h3 class="text-sm font-medium text-gray-300">Assignment {{ $i }}</h3>
-                                <button onclick="editLabel(this)" class="text-xs text-orange-400 hover:text-orange-300">Edit</button>
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <!-- Regular Assignment Positions -->
+                        @for ($i = 1; $i <= 9; $i++)
+                            <div class="@if($i === 1) col-span-2 @endif bg-[#1a1512] rounded-lg border-2 border-dashed border-[#3d322d] p-4"
+                                 ondragover="event.preventDefault();"
+                                 ondrop="handleDrop(event, this)">
+                                <div class="flex items-center justify-between mb-2">
+                                    <h3 class="@if($i === 1) text-base @else text-sm @endif font-medium text-gray-300" 
+                                        data-position-index="{{ $i }}"
+                                        data-default-name="@if($i === 1)Incident Commander @else Assignment {{ $i - 1 }} @endif">
+                                        @if($i === 1)
+                                            Incident Commander
+                                        @else
+                                            Assignment {{ $i - 1 }}
+                                        @endif
+                                    </h3>
+                                    <button onclick="editLabel(this)" class="text-xs text-orange-400 hover:text-orange-300">Edit</button>
+                                </div>
                             </div>
-                        </div>
-                    @endfor
+                        @endfor
+                    </div>
                 </div>
             </div>
         </div>
@@ -545,6 +553,42 @@
                 .catch(error => {
                     console.error('Error loading assignments:', error);
                 });
+            });
+
+            // Template definitions
+            const templates = {
+                default: (index) => index === 1 ? 'Incident Commander' : `Assignment ${index - 1}`,
+                template1: (index) => index === 1 ? 'Incident Commander' : `A-${index - 1} Assignment`,
+                template2: (index) => index === 1 ? 'Incident Commander' : `B-${index - 1} Assignment`
+            };
+
+            // Function to apply template
+            function applyTemplate(templateName) {
+                // Only select headers within the assignment containers grid
+                const containers = document.querySelectorAll('.col-span-3 [ondrop] h3');
+                containers.forEach(header => {
+                    const index = parseInt(header.getAttribute('data-position-index'));
+                    if (!isNaN(index)) { // Only apply template if it has a position index
+                        header.textContent = templates[templateName](index);
+                    }
+                });
+
+                // Save template preference
+                localStorage.setItem('selectedTemplate', templateName);
+            }
+
+            // Template selector event listener
+            document.getElementById('templateSelector').addEventListener('change', function(e) {
+                applyTemplate(e.target.value);
+            });
+
+            // Load saved template preference
+            document.addEventListener('DOMContentLoaded', function() {
+                const savedTemplate = localStorage.getItem('selectedTemplate');
+                if (savedTemplate) {
+                    document.getElementById('templateSelector').value = savedTemplate;
+                    applyTemplate(savedTemplate);
+                }
             });
 
             // Start the timer update interval
