@@ -62,24 +62,39 @@
             </div>
         </div>
 
-        <!-- Incident Timer -->
-        <div id="incidentTimer" class="hidden mb-6 text-center transition-colors duration-300">
-            <div class="inline-flex items-center space-x-4">
-                <div class="inline-flex items-center space-x-2">
-                    <div class="master-status-dot w-3 h-3 rounded-full bg-green-500 mr-2"></div>
-                    <div class="inline-flex items-center space-x-2 text-4xl font-bold text-gray-100">
-                        <span id="timerHours" class="timer-text">00</span>
-                        <span class="timer-text">:</span>
-                        <span id="timerMinutes" class="timer-text">00</span>
-                        <span class="timer-text">:</span>
-                        <span id="timerSeconds" class="timer-text">00</span>
+        <!-- Incident Timer and Template Selector Container -->
+        <div class="mb-6 flex items-center justify-between">
+            <!-- Empty div for left alignment -->
+            <div class="w-1/4"></div>
+            
+            <!-- Timer (centered) -->
+            <div id="incidentTimer" class="hidden transition-colors duration-300">
+                <div class="inline-flex items-center space-x-4">
+                    <div class="inline-flex items-center space-x-2">
+                        <div class="master-status-dot w-3 h-3 rounded-full bg-green-500 mr-2"></div>
+                        <div class="inline-flex items-center space-x-2 text-4xl font-bold text-gray-100">
+                            <span id="timerHours" class="timer-text">00</span>
+                            <span class="timer-text">:</span>
+                            <span id="timerMinutes" class="timer-text">00</span>
+                            <span class="timer-text">:</span>
+                            <span id="timerSeconds" class="timer-text">00</span>
+                        </div>
                     </div>
+                    <button onclick="resetAllTimers()" class="p-2 text-orange-400 hover:text-orange-300 transition-colors border border-orange-400/20 hover:border-orange-400/40 rounded-full">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
+                    </button>
                 </div>
-                <button onclick="resetAllTimers()" class="p-2 text-orange-400 hover:text-orange-300 transition-colors border border-orange-400/20 hover:border-orange-400/40 rounded-full">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                    </svg>
-                </button>
+            </div>
+
+            <!-- Template Selector (right aligned) -->
+            <div class="w-1/4 flex justify-end">
+                <select id="templateSelector" class="bg-[#2b2320] text-gray-300 border border-[#3d322d] rounded-lg px-3 py-2 focus:border-orange-500 focus:ring-1 focus:ring-orange-500">
+                    <option value="default">Default Template</option>
+                    <option value="template1">Template 1 (A-Style)</option>
+                    <option value="template2">Template 2 (B-Style)</option>
+                </select>
             </div>
         </div>
 
@@ -142,15 +157,6 @@
 
                 <!-- Assignment Containers Grid -->
                 <div class="col-span-3">
-                    <!-- Template Selector -->
-                    <div class="mb-4">
-                        <select id="templateSelector" class="bg-[#2b2320] text-gray-300 border border-[#3d322d] rounded-lg px-3 py-2 focus:border-orange-500 focus:ring-1 focus:ring-orange-500">
-                            <option value="default">Default Template</option>
-                            <option value="template1">Template 1 (A-Style)</option>
-                            <option value="template2">Template 2 (B-Style)</option>
-                        </select>
-                    </div>
-                    
                     <div class="grid grid-cols-2 gap-4">
                         <!-- Regular Assignment Positions -->
                         @for ($i = 1; $i <= 9; $i++)
