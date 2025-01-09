@@ -11,11 +11,13 @@ class FireAssignment extends Model
         'fire_id',
         'unit',
         'position',
-        'assignment_time'
+        'assignment_time',
+        'start_time'
     ];
 
     protected $casts = [
-        'assignment_time' => 'datetime'
+        'assignment_time' => 'datetime',
+        'start_time' => 'datetime'
     ];
 
     public function fire(): BelongsTo

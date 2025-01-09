@@ -136,14 +136,8 @@
                         <button onclick="editLabel(this)" class="text-xs text-orange-400 hover:text-orange-300">Edit</button>
                     </div>
                     <!-- Example Draggable Units -->
-                    <div class="space-y-2">
-                        <div class="draggable-unit p-3 rounded-md"
-                             draggable="true"
-                             ondragstart="handleDragStart(event)">
-                            <div class="flex items-center">
-                                <span class="unit-name font-medium text-gray-300">{{ $fire->responsible_unit }}</span>
-                            </div>
-                        </div>
+                    <div id="availableUnitsContainer" class="space-y-2">
+                        <!-- Units will be populated by JavaScript -->
                     </div>
                 </div>
 
@@ -193,11 +187,8 @@
             function updateMasterTimer() {
                 const now = new Date();
                 
-                // Find all units except IC
-                const allUnits = Array.from(document.querySelectorAll('[id^="unit-"]')).filter(unit => {
-                    const container = unit.closest('div[ondrop]');
-                    return !container.querySelector('h3')?.textContent.includes('Incident Commander');
-                });
+                // Get all units, including IC
+                const allUnits = Array.from(document.querySelectorAll('[id^="unit-"]'));
 
                 let maxDiff = 0;
                 let hasOvertime = false;
@@ -209,11 +200,41 @@
                         const diff = now.getTime() - unitStartTime;
                         maxDiff = Math.max(maxDiff, diff);
                         
-                        if (diff >= TWO_MINUTES) {
-                            hasOvertime = true;
+                        // Update individual unit timer
+                        const timerElement = unit.querySelector('.unit-timer');
+                        const statusDot = unit.querySelector('.status-dot');
+                        if (timerElement) {
+                            timerElement.textContent = formatTime(diff);
+                            
+                            if (diff >= TWO_MINUTES) {
+                                hasOvertime = true;
+                                timerElement.classList.remove('text-green-600');
+                                timerElement.classList.add('text-red-600');
+                                if (statusDot) {
+                                    statusDot.classList.remove('bg-green-500');
+                                    statusDot.classList.add('bg-red-500');
+                                }
+                                unit.classList.add('flash-warning');
+                            } else {
+                                timerElement.classList.add('text-green-600');
+                                timerElement.classList.remove('text-red-600');
+                                if (statusDot) {
+                                    statusDot.classList.add('bg-green-500');
+                                    statusDot.classList.remove('bg-red-500');
+                                }
+                                unit.classList.remove('flash-warning');
+                            }
                         }
                     }
                 });
+
+                // Show timer if any units are assigned
+                const masterTimer = document.getElementById('incidentTimer');
+                if (allUnits.some(unit => unit.getAttribute('data-start-time'))) {
+                    masterTimer.classList.remove('hidden');
+                } else {
+                    masterTimer.classList.add('hidden');
+                }
 
                 // Update master timer with longest time
                 const [hours, minutes, seconds] = formatTime(maxDiff).split(':');
@@ -221,7 +242,6 @@
                 document.getElementById('timerMinutes').textContent = minutes;
                 document.getElementById('timerSeconds').textContent = seconds;
 
-                const masterTimer = document.getElementById('incidentTimer');
                 const masterDot = masterTimer.querySelector('.master-status-dot');
                 const timerTexts = masterTimer.querySelectorAll('.timer-text');
 
@@ -236,48 +256,6 @@
                     timerTexts.forEach(text => text.classList.remove('text-red-600'));
                     timerTexts.forEach(text => text.classList.add('text-green-600'));
                     masterTimer.classList.remove('flash-warning');
-                }
-            }
-
-            function updateUnitTimer(unitElement) {
-                const startTimeAttr = unitElement.getAttribute('data-start-time');
-                if (!startTimeAttr) return;
-
-                const unitStartTime = parseInt(startTimeAttr);
-                const now = new Date().getTime();
-                const diff = now - unitStartTime;
-                
-                const timerElement = unitElement.querySelector('.unit-timer');
-                const statusDot = unitElement.querySelector('.status-dot');
-                
-                if (timerElement && statusDot) {
-                    timerElement.textContent = formatTime(diff);
-                    
-                    if (diff >= TWO_MINUTES) {
-                        timerElement.classList.remove('text-green-600');
-                        timerElement.classList.add('text-red-600');
-                        statusDot.classList.remove('bg-green-500');
-                        statusDot.classList.add('bg-red-500');
-                        unitElement.classList.add('flash-warning');
-                    } else {
-                        timerElement.classList.add('text-green-600');
-                        timerElement.classList.remove('text-red-600');
-                        statusDot.classList.add('bg-green-500');
-                        statusDot.classList.remove('bg-red-500');
-                        unitElement.classList.remove('flash-warning');
-                    }
-                }
-            }
-
-            function startTimer() {
-                if (!timerInterval) {
-                    const timerElement = document.getElementById('incidentTimer');
-                    timerElement.classList.remove('hidden');
-                    startTime = new Date();
-                    timerInterval = setInterval(() => {
-                        updateMasterTimer();
-                        document.querySelectorAll('[id^="unit-"]').forEach(updateUnitTimer);
-                    }, 1000);
                 }
             }
 
@@ -312,9 +290,9 @@
                     sourceElement.remove();
                 }
 
-                // Check if this is the IC position
-                const isICPosition = container.querySelector('h3')?.textContent.includes('Incident Commander');
+                // Get the position name
                 const position = container.querySelector('h3')?.textContent.trim() || '';
+                const startTime = new Date().getTime();
 
                 // Save the assignment to the database
                 fetch(`/fire/command/{{ $fire->id }}/assignments`, {
@@ -326,7 +304,8 @@
                     },
                     body: JSON.stringify({
                         unit: data,
-                        position: position
+                        position: position,
+                        start_time: startTime
                     })
                 })
                 .then(response => {
@@ -346,55 +325,59 @@
                 draggedElement.ondragstart = function(e) { handleDragStart(e) };
                 draggedElement.id = `unit-${Date.now()}`;
                 
-                // Only set start time if not IC position
-                if (!isICPosition) {
-                    draggedElement.setAttribute('data-start-time', Date.now());
-                }
+                // Set start time when unit is first assigned
+                draggedElement.setAttribute('data-start-time', startTime.toString());
 
                 // Add unit content with timer and status dot
-                if (isICPosition) {
-                    draggedElement.innerHTML = `
+                draggedElement.innerHTML = `
+                    <div class="flex items-center justify-between">
                         <div class="flex items-center">
+                            <div class="status-dot w-2 h-2 rounded-full bg-green-500 mr-2"></div>
                             <span class="unit-name font-medium text-gray-300">${data}</span>
                         </div>
-                    `;
-                } else {
-                    draggedElement.innerHTML = `
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center">
-                                <div class="status-dot w-2 h-2 rounded-full bg-green-500 mr-2"></div>
-                                <span class="unit-name font-medium text-gray-300">${data}</span>
-                            </div>
-                            <div class="flex items-center space-x-2">
-                                <button onclick="resetUnitTimer(this)" class="text-xs text-orange-400 hover:text-orange-300 transition-colors">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                                    </svg>
-                                </button>
-                                <span class="unit-timer text-xs font-mono text-green-600">00:00:00</span>
-                            </div>
+                        <div class="flex items-center space-x-2">
+                            <button onclick="resetUnitTimer(this)" class="text-xs text-orange-400 hover:text-orange-300 transition-colors">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                </svg>
+                            </button>
+                            <span class="unit-timer text-xs font-mono text-green-600">00:00:00</span>
                         </div>
-                    `;
-                }
-
+                    </div>
+                `;
+                
                 // Add to the new container
                 container.appendChild(draggedElement);
-
-                // Check if this is the IC position and start timer if needed
-                if (isICPosition) {
-                    startTimer();
-                }
-
-                // Start updating this unit's timer if not IC
-                if (!isICPosition) {
-                    updateUnitTimer(draggedElement);
-                }
+                updateMasterTimer();
             }
 
             function resetUnitTimer(button) {
                 const unitElement = button.closest('.draggable-unit');
                 if (unitElement) {
-                    unitElement.setAttribute('data-start-time', Date.now());
+                    const startTime = new Date().getTime();
+                    unitElement.setAttribute('data-start-time', startTime.toString());
+                    
+                    // Update the start time in the database
+                    const unit = unitElement.querySelector('.unit-name').textContent.trim();
+                    const position = unitElement.closest('[ondrop]').querySelector('h3').textContent.trim();
+                    
+                    fetch(`/fire/command/{{ $fire->id }}/assignments`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            unit: unit,
+                            position: position,
+                            start_time: startTime
+                        })
+                    })
+                    .catch(error => {
+                        console.error('Error updating timer:', error);
+                    });
+
                     const statusDot = unitElement.querySelector('.status-dot');
                     const timerElement = unitElement.querySelector('.unit-timer');
                     
@@ -404,10 +387,27 @@
                     timerElement.classList.remove('text-red-600');
                     timerElement.classList.add('text-green-600');
                     unitElement.classList.remove('flash-warning');
-                    
-                    // Update the timer immediately
-                    updateUnitTimer(unitElement);
                 }
+                updateMasterTimer();
+            }
+
+            function resetAllTimers() {
+                const allUnits = document.querySelectorAll('[id^="unit-"]');
+                allUnits.forEach(unit => {
+                    unit.removeAttribute('data-start-time');
+                    const statusDot = unit.querySelector('.status-dot');
+                    const timerElement = unit.querySelector('.unit-timer');
+                    
+                    if (statusDot && timerElement) {
+                        // Reset visual states
+                        statusDot.classList.remove('bg-red-500');
+                        statusDot.classList.add('bg-green-500');
+                        timerElement.classList.remove('text-red-600');
+                        timerElement.classList.add('text-green-600');
+                        unit.classList.remove('flash-warning');
+                    }
+                });
+                updateMasterTimer();
             }
 
             function editLabel(button) {
@@ -433,33 +433,6 @@
                 input.focus();
             }
 
-            function resetAllTimers() {
-                const now = Date.now();
-                // Find all units except IC
-                const allUnits = Array.from(document.querySelectorAll('[id^="unit-"]')).filter(unit => {
-                    const container = unit.closest('div[ondrop]');
-                    return !container.querySelector('h3')?.textContent.includes('Incident Commander');
-                });
-
-                allUnits.forEach(unit => {
-                    unit.setAttribute('data-start-time', now);
-                    const statusDot = unit.querySelector('.status-dot');
-                    const timerElement = unit.querySelector('.unit-timer');
-                    
-                    if (statusDot && timerElement) {
-                        // Reset visual states
-                        statusDot.classList.remove('bg-red-500');
-                        statusDot.classList.add('bg-green-500');
-                        timerElement.classList.remove('text-red-600');
-                        timerElement.classList.add('text-green-600');
-                        unit.classList.remove('flash-warning');
-                    }
-                });
-
-                // Update master timer immediately
-                updateMasterTimer();
-            }
-
             // Load existing assignments when page loads
             document.addEventListener('DOMContentLoaded', function() {
                 fetch(`/fire/command/{{ $fire->id }}/assignments`, {
@@ -476,6 +449,28 @@
                 })
                 .then(assignments => {
                     if (assignments && Array.isArray(assignments)) {
+                        // Check if the responsible unit is already assigned
+                        const responsibleUnit = '{{ $fire->responsible_unit }}';
+                        const isResponsibleUnitAssigned = assignments.some(assignment => 
+                            assignment.unit === responsibleUnit
+                        );
+
+                        // Only add the responsible unit to available units if it's not assigned
+                        if (!isResponsibleUnitAssigned) {
+                            const availableUnitsContainer = document.getElementById('availableUnitsContainer');
+                            const unitElement = document.createElement('div');
+                            unitElement.className = 'draggable-unit p-3 rounded-md';
+                            unitElement.draggable = true;
+                            unitElement.ondragstart = function(e) { handleDragStart(e) };
+                            unitElement.innerHTML = `
+                                <div class="flex items-center">
+                                    <span class="unit-name font-medium text-gray-300">${responsibleUnit}</span>
+                                </div>
+                            `;
+                            availableUnitsContainer.appendChild(unitElement);
+                        }
+
+                        // Load existing assignments into their containers
                         assignments.forEach(assignment => {
                             // Find the target container
                             const containers = document.querySelectorAll('div[ondrop]');
@@ -484,23 +479,55 @@
                             );
 
                             if (targetContainer) {
-                                // Create a fake drop event
-                                const fakeEvent = new Event('custom');
-                                fakeEvent.preventDefault = () => {};
-                                fakeEvent.dataTransfer = {
-                                    getData: (type) => type === 'text/plain' ? assignment.unit : 'available'
-                                };
+                                // Create new element in the target container
+                                const draggedElement = document.createElement('div');
+                                draggedElement.className = 'draggable-unit p-3 rounded-md';
+                                draggedElement.draggable = true;
+                                draggedElement.ondragstart = function(e) { handleDragStart(e) };
+                                draggedElement.id = `unit-${Date.now()}`;
+                                
+                                // Convert the database timestamp to JavaScript timestamp
+                                if (assignment.start_time) {
+                                    const startTime = new Date(assignment.start_time).getTime();
+                                    draggedElement.setAttribute('data-start-time', startTime.toString());
+                                }
 
-                                // Trigger the drop
-                                handleDrop(fakeEvent, targetContainer);
+                                // Add unit content with timer and status dot
+                                draggedElement.innerHTML = `
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center">
+                                            <div class="status-dot w-2 h-2 rounded-full bg-green-500 mr-2"></div>
+                                            <span class="unit-name font-medium text-gray-300">${assignment.unit}</span>
+                                        </div>
+                                        <div class="flex items-center space-x-2">
+                                            <button onclick="resetUnitTimer(this)" class="text-xs text-orange-400 hover:text-orange-300 transition-colors">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                                </svg>
+                                            </button>
+                                            <span class="unit-timer text-xs font-mono text-green-600">00:00:00</span>
+                                        </div>
+                                    </div>
+                                `;
+                                
+                                // Add to the container
+                                targetContainer.appendChild(draggedElement);
                             }
                         });
+                        // Update all timers immediately
+                        updateMasterTimer();
                     }
                 })
                 .catch(error => {
                     console.error('Error loading assignments:', error);
                 });
             });
+
+            // Start the timer update interval
+            setInterval(updateMasterTimer, 1000);
+            
+            // Initial update
+            updateMasterTimer();
         </script>
 
         <!-- Action Buttons -->

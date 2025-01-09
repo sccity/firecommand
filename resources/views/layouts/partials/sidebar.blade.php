@@ -3,7 +3,7 @@
     <div class="px-6 py-8">
         <div class="text-2xl font-bold text-white tracking-tight">
             <span class="bg-clip-text text-transparent bg-gradient-to-r from-[#FFB347] to-[#FFCC33]">
-                Santa Clara
+                Fire Command
             </span>
         </div>
     </div>
@@ -60,37 +60,7 @@
 
     <!-- Navigation -->
     <nav class="px-4 space-y-2">
-        <!-- Administration Section -->
-        <div x-data="{ open: false }" class="mb-4">
-            <button @click="open = !open" 
-                    class="flex items-center w-full px-4 py-3 rounded-lg text-gray-300 hover:text-[#FFB347] hover:bg-[#2F1810]/50 transition-all duration-200 group">
-                <div class="p-2 mr-3 rounded-lg bg-gradient-to-br from-[#D2691E] to-[#FFB347] shadow-lg group-hover:shadow-[#FFB347]/20">
-                    <svg class="w-5 h-5 text-white transform transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                    </svg>
-                </div>
-                <span class="font-medium">Administration</span>
-                <svg :class="{'rotate-180': open}" class="w-4 h-4 ml-auto transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                </svg>
-            </button>
-            
-            <div x-show="open"
-                 x-transition:enter="transition ease-out duration-200"
-                 x-transition:enter-start="opacity-0 transform -translate-y-2"
-                 x-transition:enter-end="opacity-100 transform translate-y-0"
-                 x-transition:leave="transition ease-in duration-150"
-                 x-transition:leave-start="opacity-100 transform translate-y-0"
-                 x-transition:leave-end="opacity-0 transform -translate-y-2"
-                 class="mt-2 ml-4 pl-8 border-l-2 border-[#8B4513]/30">
-                <a href="{{ route('admin.finance.index') }}" 
-                   class="flex items-center py-2 text-sm text-gray-300 hover:text-[#FFB347] transition-colors">
-                    Finance Tools
-                </a>
-            </div>
-        </div>
-
-        <!-- Fire Section -->
+           <!-- Fire Section -->
         <div x-data="{ open: true }" class="mb-4">
             <button @click="open = !open" 
                     class="flex items-center w-full px-4 py-3 rounded-lg text-gray-300 hover:text-[#FFB347] hover:bg-[#2F1810]/50 transition-all duration-200 group">

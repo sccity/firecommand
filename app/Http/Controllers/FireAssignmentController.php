@@ -7,6 +7,7 @@ use App\Models\FireAssignment;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
 class FireAssignmentController extends Controller
 {
@@ -36,24 +37,35 @@ class FireAssignmentController extends Controller
             $validated = $request->validate([
                 'unit' => 'required|string',
                 'position' => 'required|string',
+                'start_time' => 'nullable|numeric'
             ]);
 
             Log::info('Validation passed', ['validated' => $validated]);
 
-            // Remove any existing assignment for this unit
-            $fire->assignments()->where('unit', $validated['unit'])->delete();
+            DB::beginTransaction();
 
-            // Create new assignment
+            // Remove any existing assignment for this unit across ALL fires
+            FireAssignment::where('unit', $validated['unit'])->delete();
+
+            // Create new assignment with proper timestamp handling
+            $startTime = $validated['start_time'] 
+                ? new \DateTime('@' . ($validated['start_time'] / 1000)) // Convert JS milliseconds to seconds
+                : now();
+
             $assignment = $fire->assignments()->create([
                 'unit' => $validated['unit'],
                 'position' => $validated['position'],
                 'assignment_time' => now(),
+                'start_time' => $startTime
             ]);
+
+            DB::commit();
 
             Log::info('Assignment created successfully', ['assignment' => $assignment]);
 
             return response()->json($assignment);
         } catch (\Exception $e) {
+            DB::rollBack();
             Log::error('Error storing assignment: ' . $e->getMessage(), [
                 'fire_id' => $fire->id,
                 'request_data' => $request->all(),
