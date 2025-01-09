@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Fire extends Model
 {
@@ -34,4 +35,9 @@ class Fire extends Model
         'longitude' => 'float',
         'assigned_units' => 'array'
     ];
+
+    public function assignments(): HasMany
+    {
+        return $this->hasMany(FireAssignment::class);
+    }
 }

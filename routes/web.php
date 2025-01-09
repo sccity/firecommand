@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Admin\FinanceController;
 use App\Http\Controllers\Fire\CommandController;
 use App\Http\Controllers\FireController;
+use App\Http\Controllers\FireAssignmentController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -28,7 +29,11 @@ Route::middleware('auth')->group(function () {
     Route::prefix('fire')->name('fire.')->group(function () {
         Route::get('/command', [CommandController::class, 'index'])->name('command.index');
         Route::get('/command/{fire}', [CommandController::class, 'show'])->name('command.show');
+        Route::post('/command/{fire}/assignments', [FireAssignmentController::class, 'store'])->name('fire.assignments.store');
+        Route::get('/command/{fire}/assignments', [FireAssignmentController::class, 'index'])->name('fire.assignments.index');
+    
     });
+
 
 });
 

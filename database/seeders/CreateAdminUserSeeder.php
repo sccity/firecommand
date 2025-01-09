@@ -10,13 +10,15 @@ class CreateAdminUserSeeder extends Seeder
 {
     public function run(): void
     {
-        $admin = User::create([
-            'name' => 'System Administrator',
-            'email' => 'admin@santaclarautah.gov',
-            'password' => Hash::make('Admin123!'),
-            'department' => 'IT',
-        ]);
+        $user = User::updateOrCreate(
+            ['email' => 'admin@santaclarautah.gov'],
+            [
+                'name' => 'System Administrator',
+                'password' => Hash::make('password'),
+                'department' => 'IT'
+            ]
+        );
 
-        $admin->assignRole('super_admin');
+        $user->assignRole('super_admin');
     }
 }

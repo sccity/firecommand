@@ -1,4 +1,5 @@
 <x-app-layout class="bg-[#1a1512]">
+    @csrf
     <div class="space-y-6 bg-[#1a1512] min-h-screen p-6">
         <!-- Incident Overview -->
         <div class="bg-[#2b2320] rounded-lg shadow-lg border border-[#3d322d]">
@@ -313,6 +314,30 @@
 
                 // Check if this is the IC position
                 const isICPosition = container.querySelector('h3')?.textContent.includes('Incident Commander');
+                const position = container.querySelector('h3')?.textContent.trim() || '';
+
+                // Save the assignment to the database
+                fetch(`/fire/command/{{ $fire->id }}/assignments`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        unit: data,
+                        position: position
+                    })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .catch(error => {
+                    console.error('Error saving assignment:', error);
+                });
 
                 // Create new element in the target container
                 const draggedElement = document.createElement('div');
@@ -434,6 +459,48 @@
                 // Update master timer immediately
                 updateMasterTimer();
             }
+
+            // Load existing assignments when page loads
+            document.addEventListener('DOMContentLoaded', function() {
+                fetch(`/fire/command/{{ $fire->id }}/assignments`, {
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(assignments => {
+                    if (assignments && Array.isArray(assignments)) {
+                        assignments.forEach(assignment => {
+                            // Find the target container
+                            const containers = document.querySelectorAll('div[ondrop]');
+                            const targetContainer = Array.from(containers).find(container => 
+                                container.querySelector('h3')?.textContent.trim() === assignment.position
+                            );
+
+                            if (targetContainer) {
+                                // Create a fake drop event
+                                const fakeEvent = new Event('custom');
+                                fakeEvent.preventDefault = () => {};
+                                fakeEvent.dataTransfer = {
+                                    getData: (type) => type === 'text/plain' ? assignment.unit : 'available'
+                                };
+
+                                // Trigger the drop
+                                handleDrop(fakeEvent, targetContainer);
+                            }
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading assignments:', error);
+                });
+            });
         </script>
 
         <!-- Action Buttons -->
