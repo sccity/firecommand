@@ -63,12 +63,15 @@
 
         <!-- Incident Timer -->
         <div id="incidentTimer" class="hidden mb-6 text-center transition-colors duration-300">
-            <div class="inline-flex items-center space-x-2 text-4xl font-bold text-gray-700">
-                <span id="timerHours">00</span>
-                <span>:</span>
-                <span id="timerMinutes">00</span>
-                <span>:</span>
-                <span id="timerSeconds">00</span>
+            <div class="inline-flex items-center space-x-2">
+                <div class="master-status-dot w-3 h-3 rounded-full bg-green-500 mr-2"></div>
+                <div class="inline-flex items-center space-x-2 text-4xl font-bold text-gray-700">
+                    <span id="timerHours" class="timer-text">00</span>
+                    <span class="timer-text">:</span>
+                    <span id="timerMinutes" class="timer-text">00</span>
+                    <span class="timer-text">:</span>
+                    <span id="timerSeconds" class="timer-text">00</span>
+                </div>
             </div>
             <div class="text-sm text-gray-500 mt-1">Incident Duration</div>
         </div>
@@ -81,6 +84,37 @@
             }
             .flash-warning {
                 animation: flash-warning 2s infinite;
+            }
+            .timer-text {
+                transition: color 0.3s ease;
+            }
+            .master-status-dot {
+                transition: background-color 0.3s ease;
+            }
+            .draggable-unit {
+                background: linear-gradient(to bottom, #ffffff 0%, #f5f5f5 100%);
+                border: 1px solid #e5e5e5;
+                box-shadow: 
+                    inset 0 1px 0 rgba(255,255,255,0.9),
+                    0 1px 2px rgba(0,0,0,0.05);
+                cursor: move;
+                transition: all 0.2s ease;
+                user-select: none;
+            }
+            .draggable-unit:hover {
+                background: linear-gradient(to bottom, #f8f8f8 0%, #f0f0f0 100%);
+                border-color: #D2691E;
+                box-shadow: 
+                    inset 0 1px 0 rgba(255,255,255,0.9),
+                    0 2px 4px rgba(210,105,30,0.1);
+                transform: translateY(-1px);
+            }
+            .draggable-unit:active {
+                background: linear-gradient(to bottom, #f0f0f0 0%, #e8e8e8 100%);
+                box-shadow: 
+                    inset 0 1px 2px rgba(0,0,0,0.1),
+                    0 1px 2px rgba(0,0,0,0.05);
+                transform: translateY(0px);
             }
         </style>
 
@@ -96,31 +130,41 @@
                         <button onclick="editLabel(this)" class="text-xs text-[#D2691E] hover:text-[#A0522D]">Edit</button>
                     </div>
                     <!-- Example Draggable Units -->
-                    <div class="space-y-3">
-                        <div class="bg-white p-3 rounded shadow-sm border border-gray-200 cursor-move hover:shadow-md transition-shadow"
+                    <div class="space-y-2">
+                        <div class="draggable-unit p-3 rounded-md"
                              draggable="true"
                              ondragstart="handleDragStart(event)">
-                            Engine 1
+                            <div class="flex items-center">
+                                <span class="font-medium text-gray-700">Engine 1</span>
+                            </div>
                         </div>
-                        <div class="bg-white p-3 rounded shadow-sm border border-gray-200 cursor-move hover:shadow-md transition-shadow"
+                        <div class="draggable-unit p-3 rounded-md"
                              draggable="true"
                              ondragstart="handleDragStart(event)">
-                            Engine 2
+                            <div class="flex items-center">
+                                <span class="font-medium text-gray-700">Engine 2</span>
+                            </div>
                         </div>
-                        <div class="bg-white p-3 rounded shadow-sm border border-gray-200 cursor-move hover:shadow-md transition-shadow"
+                        <div class="draggable-unit p-3 rounded-md"
                              draggable="true"
                              ondragstart="handleDragStart(event)">
-                            Truck 1
+                            <div class="flex items-center">
+                                <span class="font-medium text-gray-700">Truck 1</span>
+                            </div>
                         </div>
-                        <div class="bg-white p-3 rounded shadow-sm border border-gray-200 cursor-move hover:shadow-md transition-shadow"
+                        <div class="draggable-unit p-3 rounded-md"
                              draggable="true"
                              ondragstart="handleDragStart(event)">
-                            Medic 1
+                            <div class="flex items-center">
+                                <span class="font-medium text-gray-700">Medic 1</span>
+                            </div>
                         </div>
-                        <div class="bg-white p-3 rounded shadow-sm border border-gray-200 cursor-move hover:shadow-md transition-shadow"
+                        <div class="draggable-unit p-3 rounded-md"
                              draggable="true"
                              ondragstart="handleDragStart(event)">
-                            Battalion 1
+                            <div class="flex items-center">
+                                <span class="font-medium text-gray-700">Battalion 1</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -182,17 +226,26 @@
                 let hasOvertime = false;
                 
                 allUnits.forEach(unit => {
-                    if (unit.classList.contains('text-red-600')) {
+                    if (unit.querySelector('.status-dot')?.classList.contains('bg-red-500')) {
                         hasOvertime = true;
                     }
                 });
 
                 const masterTimer = document.getElementById('incidentTimer');
+                const masterDot = masterTimer.querySelector('.master-status-dot');
+                const timerTexts = masterTimer.querySelectorAll('.timer-text');
+
                 if (hasOvertime) {
-                    masterTimer.classList.add('text-red-600');
+                    masterDot.classList.remove('bg-green-500');
+                    masterDot.classList.add('bg-red-500');
+                    timerTexts.forEach(text => text.classList.add('text-red-600'));
+                    masterTimer.classList.add('flash-warning');
                 } else {
-                    masterTimer.classList.remove('text-red-600');
-                    masterTimer.classList.add('text-green-600');
+                    masterDot.classList.add('bg-green-500');
+                    masterDot.classList.remove('bg-red-500');
+                    timerTexts.forEach(text => text.classList.remove('text-red-600'));
+                    timerTexts.forEach(text => text.classList.add('text-green-600'));
+                    masterTimer.classList.remove('flash-warning');
                 }
             }
 
@@ -239,9 +292,13 @@
             }
 
             function handleDragStart(event) {
-                event.dataTransfer.setData('text/plain', event.target.innerHTML.trim());
-                event.dataTransfer.setData('sourceId', event.target.id || 'available');
-                event.target.classList.add('opacity-50');
+                // Ensure we're dragging the outermost draggable container
+                const draggedUnit = event.target.closest('.draggable-unit');
+                if (!draggedUnit) return;
+
+                event.dataTransfer.setData('text/plain', draggedUnit.querySelector('.unit-name').textContent.trim());
+                event.dataTransfer.setData('sourceId', draggedUnit.id || 'available');
+                draggedUnit.classList.add('opacity-50');
             }
 
             function handleDrop(event, container) {
@@ -252,8 +309,10 @@
                 // Find the source element
                 let sourceElement;
                 if (sourceId === 'available') {
-                    const availableUnits = document.querySelectorAll('[draggable=true]');
-                    sourceElement = Array.from(availableUnits).find(el => el.textContent.trim() === data);
+                    const availableUnits = document.querySelectorAll('.draggable-unit');
+                    sourceElement = Array.from(availableUnits).find(el => 
+                        el.querySelector('.unit-name')?.textContent.trim() === data
+                    );
                 } else {
                     sourceElement = document.getElementById(sourceId);
                 }
@@ -263,9 +322,12 @@
                     sourceElement.remove();
                 }
 
+                // Check if this is the IC position
+                const isICPosition = container.querySelector('h3')?.textContent.includes('Incident Commander');
+
                 // Create new element in the target container
                 const draggedElement = document.createElement('div');
-                draggedElement.className = 'bg-white p-3 rounded shadow-sm border border-gray-200 cursor-move hover:shadow-md transition-shadow';
+                draggedElement.className = 'draggable-unit p-3 rounded-md';
                 draggedElement.draggable = true;
                 draggedElement.ondragstart = function(e) { handleDragStart(e) };
                 draggedElement.id = `unit-${Date.now()}`;
@@ -276,9 +338,18 @@
                     <div class="flex items-center justify-between">
                         <div class="flex items-center">
                             <div class="status-dot w-2 h-2 rounded-full bg-green-500 mr-2"></div>
-                            <span>${data}</span>
+                            <span class="unit-name font-medium text-gray-700">${data}</span>
                         </div>
-                        <span class="unit-timer text-xs font-mono text-green-600">00:00:00</span>
+                        <div class="flex items-center space-x-2">
+                            ${!isICPosition ? `
+                                <button onclick="resetUnitTimer(this)" class="text-xs text-[#D2691E] hover:text-[#A0522D] transition-colors">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                    </svg>
+                                </button>
+                            ` : ''}
+                            <span class="unit-timer text-xs font-mono text-green-600">00:00:00</span>
+                        </div>
                     </div>
                 `;
 
@@ -286,7 +357,6 @@
                 container.appendChild(draggedElement);
 
                 // Check if this is the IC position and start timer if needed
-                const isICPosition = container.querySelector('h3')?.textContent.includes('Incident Commander');
                 if (isICPosition) {
                     startTimer();
                 }
@@ -294,6 +364,35 @@
                 // Start updating this unit's timer
                 updateUnitTimer(draggedElement);
             }
+
+            function resetUnitTimer(button) {
+                const unitElement = button.closest('.draggable-unit');
+                if (unitElement) {
+                    unitElement.setAttribute('data-start-time', Date.now());
+                    const statusDot = unitElement.querySelector('.status-dot');
+                    const timerElement = unitElement.querySelector('.unit-timer');
+                    
+                    // Reset visual states
+                    statusDot.classList.remove('bg-red-500');
+                    statusDot.classList.add('bg-green-500');
+                    timerElement.classList.remove('text-red-600');
+                    timerElement.classList.add('text-green-600');
+                    unitElement.classList.remove('flash-warning');
+                    
+                    // Update the timer immediately
+                    updateUnitTimer(unitElement);
+                }
+            }
+
+            // Update the initial unit HTML to include the unit-name class
+            document.querySelectorAll('.draggable-unit').forEach(unit => {
+                const unitText = unit.textContent.trim();
+                unit.innerHTML = `
+                    <div class="flex items-center">
+                        <span class="unit-name font-medium text-gray-700">${unitText}</span>
+                    </div>
+                `;
+            });
 
             function editLabel(button) {
                 const header = button.parentElement.querySelector('h3');
